@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AEP Energy Consumption Project - EDA</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>AEP Energy Consumption Project</h1>
+</header>
+
+<div class="layout">
+    <!-- Left panel -->
+    <nav class="sidebar">
+        <ul>
+            <li>
+                <a href="{{ url_for('data_loading') }}"
+                   class="menu-item {% if active == 'data-loading' %}active{% endif %}">
+                    Data Loading
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('eda') }}" class="menu-item {% if active == 'eda' %}active{% endif %}">EDA</a>
+            </li>
+            <li class="menu-item disabled">Preprocessing (coming soon)</li>
+            <li class="menu-item disabled">Model Training (coming soon)</li>
+            <li class="menu-item disabled">Prediction (coming soon)</li>
+        </ul>
+    </nav>
+
+    <!-- Main content -->
+    <main class="content">
+        <h2>Exploratory Data Analysis Dashboard (8 Tasks)</h2>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if results %}
+            <!-- TASK 1: MISSING VALUES -->
+            <div class="section-group">
+                <h3>Task 1: Missing Values Analysis</h3>
+                <div class="two-column-row">
+                    <div class="column-card">
+                        {% if results.missing %}
+                            <div class="table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Column Name</th>
+                                            <th>Missing Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for col, count in results.missing.items() %}
+                                        <tr>
+                                            <td>{{ col }}</td>
+                                            <td>{{ count }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="no-data-msg">No missing values in this dataset portion.</p>
+                        {% endif %}
+                    </div>
+                    <div class="column-card">
+                        {% for chart in results.charts if chart.filename == 'missing_values.png' %}
+                            <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 2: DUPLICATE ROWS -->
+            <div class="section-group">
+                <h3>Task 2: Duplicate Rows Check</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Duplicate Row Count</span>
+                        <span class="metric-value">{{ results.duplicate_count }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 3: ENERGY CONSUMPTION STATISTICS -->
+            <div class="section-group">
+                <h3>Task 3: Energy Consumption (MW) Summary Statistics</h3>
+                <div class="two-column-row">
+                    <div class="column-card">
+                        <table class="summary-table">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Value (MW)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for metric, val in results.target_counts.items() %}
+                                <tr>
+                                    <td>{{ metric }}</td>
+                                    <td>{{ "{:,.2f}".format(val) }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="column-card">
+                        {% for chart in results.charts if chart.filename == 'energy_boxplot.png' %}
+                            <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img">
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 4: OVERALL TIME SERIES TREND -->
+            <div class="section-group">
+                <h3>Task 4: Overall Time Series Demand Trend (Daily Average)</h3>
+                {% for chart in results.charts if chart.filename == 'energy_trend.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 5: MONTHLY CONSUMPTION TREND -->
+            <div class="section-group">
+                <h3>Task 5: Monthly Consumption Trend (Seasonal Peaks)</h3>
+                {% for chart in results.charts if chart.filename == 'monthly_seasonal_trend.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 6: DAILY CONSUMPTION TREND -->
+            <div class="section-group">
+                <h3>Task 6: Daily Consumption Trend (Day of Week Analysis)</h3>
+                {% for chart in results.charts if chart.filename == 'daily_consumption_trend.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 7: HOURLY CONSUMPTION TREND -->
+            <div class="section-group">
+                <h3>Task 7: Hourly Consumption Trend (Average 24-Hour Load Profile)</h3>
+                {% for chart in results.charts if chart.filename == 'hourly_load_profile.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 8: DISTRIBUTION PROFILE OF ENERGY USAGE -->
+            <div class="section-group">
+                <h3>Task 8: Probability Distribution Profile of AEP Energy Consumption</h3>
+                {% for chart in results.charts if chart.filename == 'energy_distribution.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+</body>
+</html>
