@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEP Energy Consumption Project - Preprocessing</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>AEP Energy Consumption Project</h1>
+</header>
+
+<div class="layout">
+    <nav class="sidebar">
+        <ul>
+            <li>
+                <a href="{{ url_for('data_loading') }}" class="menu-item {% if active == 'data-loading' %}active{% endif %}">Data Loading</a>
+            </li>
+            <li>
+                <a href="{{ url_for('preprocessing') }}" class="menu-item {% if active == 'preprocessing' %}active{% endif %}">Preprocessing</a>
+            </li>
+            <li>
+                <a href="{{ url_for('eda') }}" class="menu-item {% if active == 'eda' %}active{% endif %}">EDA</a>
+            </li>
+            <li>
+                <a href="{{ url_for('linear_regression') }}" class="menu-item {% if active == 'linear-regression' %}active{% endif %}">Linear Regression</a>
+            </li>
+            <li>
+                <a href="{{ url_for('logistic_regression') }}" class="menu-item {% if active == 'logistic-regression' %}active{% endif %}">Logistic Regression</a>
+            </li>
+            <li>
+                <a href="{{ url_for('decision_tree') }}" class="menu-item {% if active == 'decision-tree' %}active{% endif %}">Decision Tree</a>
+            </li>
+            <li class="menu-item disabled">Prediction (coming soon)</li>
+        </ul>
+    </nav>
+
+    <main class="content">
+        <h2>Preprocessing</h2>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% if summary %}
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-label">Original Rows</span>
+                    <span class="metric-value">{{ summary.original_rows }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Processed Rows</span>
+                    <span class="metric-value">{{ summary.processed_rows }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Dropped Rows</span>
+                    <span class="metric-value">{{ summary.dropped_rows }}</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Missing Values Removed</span>
+                    <span class="metric-value">{{ summary.original_missing }}</span>
+                </div>
+            </div>
+
+            <div class="section-group">
+                <h3>Feature Engineering Steps</h3>
+                <ul>
+                    <li>Converted the Datetime column to pandas datetime format.</li>
+                    <li>Dropped rows where Datetime or AEP_MW values were missing.</li>
+                    <li>Created new time-based features: Hour, Month, DayOfWeek, IsWeekend.</li>
+                    <li>Kept the target variable as AEP_MW for downstream modeling tasks.</li>
+                </ul>
+            </div>
+
+            <div class="section-group">
+                <h3>Original vs Processed Columns</h3>
+                <div class="two-column-row">
+                    <div class="column-card">
+                        <h4>Original Columns</h4>
+                        <ul>
+                            {% for col in summary.original_columns %}
+                                <li>{{ col }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="column-card">
+                        <h4>Processed Columns</h4>
+                        <ul>
+                            {% for col in summary.processed_columns %}
+                                <li>{{ col }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-group">
+                <h3>New Feature Preview</h3>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                {% for key in ['Datetime', 'AEP_MW', 'Hour', 'Month', 'DayOfWeek', 'IsWeekend'] %}
+                                    <th>{{ key }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in summary.preview %}
+                                <tr>
+                                    <td>{{ row['Datetime'] }}</td>
+                                    <td>{{ row['AEP_MW'] }}</td>
+                                    <td>{{ row['Hour'] }}</td>
+                                    <td>{{ row['Month'] }}</td>
+                                    <td>{{ row['DayOfWeek'] }}</td>
+                                    <td>{{ row['IsWeekend'] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </main>
+</div>
+
+</body>
+</html>

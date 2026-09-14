@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AEP Energy Consumption Project - EDA</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -22,17 +23,30 @@
                 </a>
             </li>
             <li>
+                <a href="{{ url_for('preprocessing') }}"
+                   class="menu-item {% if active == 'preprocessing' %}active{% endif %}">
+                    Preprocessing
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('eda') }}" class="menu-item {% if active == 'eda' %}active{% endif %}">EDA</a>
             </li>
-            <li class="menu-item disabled">Preprocessing (coming soon)</li>
-            <li class="menu-item disabled">Model Training (coming soon)</li>
+            <li>
+                <a href="{{ url_for('linear_regression') }}" class="menu-item {% if active == 'linear-regression' %}active{% endif %}">Linear Regression</a>
+            </li>
+            <li>
+                <a href="{{ url_for('logistic_regression') }}" class="menu-item {% if active == 'logistic-regression' %}active{% endif %}">Logistic Regression</a>
+            </li>
+            <li>
+                <a href="{{ url_for('decision_tree') }}" class="menu-item {% if active == 'decision-tree' %}active{% endif %}">Decision Tree</a>
+            </li>
             <li class="menu-item disabled">Prediction (coming soon)</li>
         </ul>
     </nav>
 
     <!-- Main content -->
     <main class="content">
-        <h2>Exploratory Data Analysis Dashboard (8 Tasks)</h2>
+        <h2>Exploratory Data Analysis Dashboard (15 Tasks)</h2>
 
         {% if error %}
             <div class="error">{{ error }}</div>
@@ -152,6 +166,62 @@
             <div class="section-group">
                 <h3>Task 8: Probability Distribution Profile of AEP Energy Consumption</h3>
                 {% for chart in results.charts if chart.filename == 'energy_distribution.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 9: ANNUAL GROWTH -->
+            <div class="section-group">
+                <h3>Task 9: Year-over-Year Energy Consumption Growth</h3>
+                {% for chart in results.charts if chart.filename == 'annual_energy_growth.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 10: WEEKDAY/WEEKEND -->
+            <div class="section-group">
+                <h3>Task 10: Weekday versus Weekend Demand Distribution</h3>
+                {% for chart in results.charts if chart.filename == 'weekday_weekend_comparison.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 11: SEASONAL SPREAD -->
+            <div class="section-group">
+                <h3>Task 11: Energy Consumption Spread by Season</h3>
+                {% for chart in results.charts if chart.filename == 'seasonal_boxplot.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 12: DAILY EXTREMES -->
+            <div class="section-group">
+                <h3>Task 12: Daily Peak and Minimum Demand</h3>
+                {% for chart in results.charts if chart.filename == 'daily_peaks_mins.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 13: WEEKLY HEATMAP -->
+            <div class="section-group">
+                <h3>Task 13: Hourly Demand Pattern by Day of Week</h3>
+                {% for chart in results.charts if chart.filename == 'weekly_pattern_heatmap.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 14: ROLLING VARIABILITY -->
+            <div class="section-group">
+                <h3>Task 14: Seven-Day Rolling Demand Variability</h3>
+                {% for chart in results.charts if chart.filename == 'rolling_demand_variability.png' %}
+                    <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
+                {% endfor %}
+            </div>
+
+            <!-- TASK 15: TOP DEMAND DAYS -->
+            <div class="section-group">
+                <h3>Task 15: Top 10 Highest-Demand Days</h3>
+                {% for chart in results.charts if chart.filename == 'top_demand_days.png' %}
                     <img src="{{ url_for('static', filename='charts/' + chart.filename) }}" alt="{{ chart.title }}" class="task-img-full">
                 {% endfor %}
             </div>

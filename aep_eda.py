@@ -11,6 +11,14 @@ from load_data import load_data
 # Configurations
 CHARTS_DIR = os.path.join(os.path.dirname(__file__), "static", "charts")
 CACHE_FILE = os.path.join(CHARTS_DIR, "results_cache.json")
+EXPECTED_CHARTS = {
+    "missing_values.png", "energy_boxplot.png", "energy_trend.png",
+    "monthly_seasonal_trend.png", "daily_consumption_trend.png",
+    "hourly_load_profile.png", "energy_distribution.png",
+    "annual_energy_growth.png", "weekday_weekend_comparison.png",
+    "seasonal_boxplot.png", "daily_peaks_mins.png", "weekly_pattern_heatmap.png",
+    "rolling_demand_variability.png", "top_demand_days.png",
+}
 
 def run_eda(force_run=False):
     """
@@ -26,6 +34,9 @@ def run_eda(force_run=False):
                 cached_results = json.load(f)
             
             charts_list = cached_results.get("charts", [])
+            cached_filenames = {
+                c["filename"] for c in charts_list if isinstance(c, dict) and "filename" in c
+            }
             all_exist = True
             for c in charts_list:
                 fname = c["filename"] if isinstance(c, dict) else c
@@ -35,7 +46,7 @@ def run_eda(force_run=False):
             
             is_new_format = len(charts_list) > 0 and isinstance(charts_list[0], dict)
             
-            if all_exist and is_new_format:
+            if all_exist and is_new_format and cached_filenames == EXPECTED_CHARTS:
                 print("\n========== RETURNING CACHED EDA RESULTS INSTANTLY ==========")
                 return cached_results
         except Exception as e:
@@ -50,6 +61,7 @@ def run_eda(force_run=False):
     print("=" * 80)
 
     charts = []
+    original_columns = set(data.columns)
 
     # Ensure Datetime conversion
     if "Datetime" in data.columns:
@@ -200,6 +212,123 @@ def run_eda(force_run=False):
         _save("energy_distribution.png")
         charts.append("energy_distribution.png")
 
+    # 9. ANNUAL CONSUMPTION GROWTH
+    print("\n" + "=" * 80)
+    print("9. ANNUAL CONSUMPTION GROWTH")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        annual_avg = data.groupby(data["Datetime"].dt.year)["AEP_MW"].mean()
+        plt.figure(figsize=(10, 5))
+        plt.plot(annual_avg.index, annual_avg.values, marker="o", color="#16a34a", linewidth=2)
+        plt.title("Year-over-Year Average Energy Consumption")
+        plt.xlabel("Year")
+        plt.ylabel("Average Megawatts (MW)")
+        plt.grid(True, linestyle="--", alpha=0.3)
+        _save("annual_energy_growth.png")
+        charts.append("annual_energy_growth.png")
+
+    # 10. WEEKDAY VERSUS WEEKEND DEMAND
+    print("\n" + "=" * 80)
+    print("10. WEEKDAY VERSUS WEEKEND DEMAND")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        comparison = pd.DataFrame({
+            "AEP_MW": data["AEP_MW"],
+            "Day Type": np.where(data["Datetime"].dt.dayofweek < 5, "Weekday", "Weekend"),
+        })
+        plt.figure(figsize=(8, 5))
+        sns.violinplot(x="Day Type", y="AEP_MW", data=comparison, hue="Day Type", legend=False,
+                       palette={"Weekday": "#2563eb", "Weekend": "#f97316"})
+        plt.title("Energy Demand Distribution: Weekday vs Weekend")
+        plt.xlabel("")
+        plt.ylabel("Megawatts (MW)")
+        _save("weekday_weekend_comparison.png")
+        charts.append("weekday_weekend_comparison.png")
+
+    # 11. SEASONAL DEMAND SPREAD
+    print("\n" + "=" * 80)
+    print("11. SEASONAL DEMAND SPREAD")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        season_map = {12: "Winter", 1: "Winter", 2: "Winter", 3: "Spring", 4: "Spring",
+                      5: "Spring", 6: "Summer", 7: "Summer", 8: "Summer", 9: "Fall",
+                      10: "Fall", 11: "Fall"}
+        seasonal = data[["Datetime", "AEP_MW"]].copy()
+        seasonal["Season"] = seasonal["Datetime"].dt.month.map(season_map)
+        plt.figure(figsize=(9, 5))
+        sns.boxplot(x="Season", y="AEP_MW", data=seasonal,
+                    order=["Winter", "Spring", "Summer", "Fall"], color="#60a5fa")
+        plt.title("Energy Consumption Spread by Season")
+        plt.xlabel("Season")
+        plt.ylabel("Megawatts (MW)")
+        _save("seasonal_boxplot.png")
+        charts.append("seasonal_boxplot.png")
+
+    # 12. DAILY PEAK AND MINIMUM DEMAND
+    print("\n" + "=" * 80)
+    print("12. DAILY PEAK AND MINIMUM DEMAND")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        daily_extremes = data.groupby(data["Datetime"].dt.date)["AEP_MW"].agg(["max", "min"])
+        plt.figure(figsize=(12, 5))
+        plt.plot(daily_extremes.index, daily_extremes["max"], label="Daily Peak", color="#dc2626")
+        plt.plot(daily_extremes.index, daily_extremes["min"], label="Daily Minimum", color="#0891b2")
+        plt.title("Daily Maximum and Minimum Energy Demand")
+        plt.xlabel("Date")
+        plt.ylabel("Megawatts (MW)")
+        plt.legend()
+        plt.grid(True, linestyle="--", alpha=0.3)
+        _save("daily_peaks_mins.png")
+        charts.append("daily_peaks_mins.png")
+
+    # 13. WEEKLY PATTERN HEATMAP
+    print("\n" + "=" * 80)
+    print("13. WEEKLY PATTERN HEATMAP")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        heatmap_data = data.assign(
+            Day=data["Datetime"].dt.day_name(), Hour=data["Datetime"].dt.hour
+        ).pivot_table(index="Day", columns="Hour", values="AEP_MW", aggfunc="mean")
+        heatmap_data = heatmap_data.reindex(["Monday", "Tuesday", "Wednesday", "Thursday",
+                                             "Friday", "Saturday", "Sunday"])
+        plt.figure(figsize=(14, 5))
+        sns.heatmap(heatmap_data, cmap="YlOrRd", cbar_kws={"label": "Average MW"})
+        plt.title("Average Energy Demand by Hour and Day of Week")
+        plt.xlabel("Hour of Day")
+        plt.ylabel("Day of Week")
+        _save("weekly_pattern_heatmap.png")
+        charts.append("weekly_pattern_heatmap.png")
+
+    # 14. ROLLING DEMAND VARIABILITY
+    print("\n" + "=" * 80)
+    print("14. ROLLING DEMAND VARIABILITY")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        daily_avg = data.set_index("Datetime")["AEP_MW"].resample("D").mean()
+        rolling_std = daily_avg.rolling(7).std()
+        plt.figure(figsize=(12, 5))
+        plt.plot(rolling_std.index, rolling_std.values, color="#7c3aed", linewidth=1.5)
+        plt.title("7-Day Rolling Variability of Daily Energy Demand")
+        plt.xlabel("Date")
+        plt.ylabel("Rolling Standard Deviation (MW)")
+        plt.grid(True, linestyle="--", alpha=0.3)
+        _save("rolling_demand_variability.png")
+        charts.append("rolling_demand_variability.png")
+
+    # 15. TOP DEMAND DAYS
+    print("\n" + "=" * 80)
+    print("15. TOP 10 HIGHEST-DEMAND DAYS")
+    print("=" * 80)
+    if "Datetime" in data.columns and "AEP_MW" in data.columns:
+        top_days = data.groupby(data["Datetime"].dt.date)["AEP_MW"].mean().nlargest(10).sort_values()
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=top_days.values, y=[str(day) for day in top_days.index], color="#ea580c")
+        plt.title("Top 10 Days by Average Energy Demand")
+        plt.xlabel("Average Megawatts (MW)")
+        plt.ylabel("Date")
+        _save("top_demand_days.png")
+        charts.append("top_demand_days.png")
+
     print("\n========== EDA COMPLETED ==========")
     print("Charts generated:", len(charts))
 
@@ -216,7 +345,9 @@ def run_eda(force_run=False):
         "seasonal_boxplot.png": "Energy Consumption Spread by Season",
         "daily_peaks_mins.png": "Daily Max (Peak) vs. Min Demand Gap Trend",
         "weekly_pattern_heatmap.png": "Load Heatmap: Hour of Day vs. Day of Week",
-        "energy_distribution.png": "Probability Distribution Profile of Energy Consumption"
+        "energy_distribution.png": "Probability Distribution Profile of Energy Consumption",
+        "rolling_demand_variability.png": "7-Day Rolling Variability of Daily Demand",
+        "top_demand_days.png": "Top 10 Highest-Demand Days"
     }
 
     formatted_charts = []
@@ -228,7 +359,7 @@ def run_eda(force_run=False):
 
     results = {
         "n_rows": len(data),
-        "n_cols": len(data.columns),
+        "n_cols": len(original_columns),
         "duplicate_count": duplicate_count,
         "missing": {col: int(cnt) for col, cnt in missing.items() if cnt > 0},
         "target_counts": target_counts,
