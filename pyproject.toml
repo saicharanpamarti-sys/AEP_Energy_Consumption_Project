@@ -2,4 +2,11 @@
 name = "pythonproject13"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "flask",
+    "pandas",
+    "scikit-learn",
+    "xgboost",
+    "lightgbm",
+    "catboost",
+]
