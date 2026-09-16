@@ -93,6 +93,11 @@ def get_preprocessing_summary():
     cleaned["DayOfWeek"] = cleaned["Datetime"].dt.dayofweek
     cleaned["IsWeekend"] = (cleaned["DayOfWeek"] >= 5).astype(int)
 
+    # Save preprocessed data to CSV
+    import os
+    preprocessed_path = os.path.join(os.path.dirname(__file__), "data", "AEP_hourly_preprocessed.csv")
+    cleaned.to_csv(preprocessed_path, index=False)
+
     return {
         "original_rows": original_rows,
         "processed_rows": len(cleaned),
@@ -103,6 +108,7 @@ def get_preprocessing_summary():
         "processed_missing": int(cleaned.isna().sum().sum()),
         "new_features": ["Hour", "Month", "DayOfWeek", "IsWeekend"],
         "preview": cleaned.head(5).to_dict("records"),
+        "preprocessed_path": preprocessed_path,
     }
 
 @app.route("/")
