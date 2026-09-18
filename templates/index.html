@@ -59,8 +59,12 @@
 
             {% if summary %}
                 <table class="summary-table">
+                    <tr><td>Project</td><td>{{ summary.project_name }}</td></tr>
+                    <tr><td>Dataset</td><td>{{ summary.dataset_name }}</td></tr>
                     <tr><td>Rows</td><td>{{ summary.n_rows }}</td></tr>
                     <tr><td>Columns</td><td>{{ summary.n_cols }}</td></tr>
+                    <tr><td>Duplicate rows</td><td>{{ summary.duplicate_count }}</td></tr>
+                    <tr><td>Total missing values</td><td>{{ summary.missing_total }}</td></tr>
                 </table>
 
                 <h3>Column Info</h3>
