@@ -1,12 +1,14 @@
 """
-Decision Tree Model for AEP Energy Consumption Project.
-Implements DecisionTreeRegressor and DecisionTreeClassifier.
+Random Forest Model for AEP Energy Consumption Project.
+Implements both Regression (energy demand forecasting in MW)
+and High-Demand Classification with Out-Of-Bag (OOB) evaluation enabled.
 """
 
 from pathlib import Path
 import time
 import math
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
@@ -18,7 +20,6 @@ from sklearn.metrics import (
     recall_score,
 )
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_PATH = BASE_DIR / "data" / "AEP_hourly_preprocessed.csv"
@@ -54,7 +55,13 @@ def train_regression():
         X, y_reg, test_size=0.2, random_state=42
     )
 
-    model = DecisionTreeRegressor(max_depth=10, min_samples_leaf=10, random_state=42)
+    model = RandomForestRegressor(
+        n_estimators=50,
+        max_depth=12,
+        oob_score=True,
+        random_state=42,
+        n_jobs=-1,
+    )
     t0 = time.time()
     model.fit(X_train, y_train)
     fit_time = time.time() - t0
@@ -65,7 +72,7 @@ def train_regression():
     train_pred = model.predict(X_train)
 
     return {
-        "model_name": "Decision Tree Regressor",
+        "model_name": "Random Forest Regressor",
         "task": "Regression",
         "training_rows": int(len(X_train)),
         "test_rows": int(len(X_test)),
@@ -75,7 +82,7 @@ def train_regression():
         "test_mae": round(mean_absolute_error(y_test, test_pred), 2),
         "train_r2": round(r2_score(y_train, train_pred), 4),
         "test_r2": round(r2_score(y_test, test_pred), 4),
-        "oob_score": None,
+        "oob_score": round(float(model.oob_score_), 4),
         "train_time_sec": round(fit_time, 3),
         "inference_time_sec": round(inf_time, 4),
     }
@@ -87,7 +94,13 @@ def train_classification():
         X, y_clf, test_size=0.2, random_state=42, stratify=y_clf
     )
 
-    model = DecisionTreeClassifier(max_depth=8, min_samples_leaf=10, random_state=42)
+    model = RandomForestClassifier(
+        n_estimators=50,
+        max_depth=12,
+        oob_score=True,
+        random_state=42,
+        n_jobs=-1,
+    )
     t0 = time.time()
     model.fit(X_train, y_train)
     fit_time = time.time() - t0
@@ -98,7 +111,7 @@ def train_classification():
     train_pred = model.predict(X_train)
 
     return {
-        "model_name": "Decision Tree Classifier",
+        "model_name": "Random Forest Classifier",
         "task": "Classification",
         "training_rows": int(len(X_train)),
         "test_rows": int(len(X_test)),
@@ -107,22 +120,19 @@ def train_classification():
         "precision": round(precision_score(y_test, test_pred, zero_division=0), 4),
         "recall": round(recall_score(y_test, test_pred, zero_division=0), 4),
         "f1_score": round(f1_score(y_test, test_pred, zero_division=0), 4),
-        "oob_score": None,
+        "oob_score": round(float(model.oob_score_), 4),
         "confusion_matrix": confusion_matrix(y_test, test_pred).tolist(),
         "train_time_sec": round(fit_time, 3),
         "inference_time_sec": round(inf_time, 4),
     }
 
 
-def train_decision_tree_model():
-    """Backward-compatible classification method."""
-    res = train_classification()
-    res["model_name"] = "Decision Tree"
-    return res
+def train_model():
+    return train_classification()
 
 
 if __name__ == "__main__":
-    print("--- Decision Tree Regression ---")
+    print("--- Random Forest Regression ---")
     print(train_regression())
-    print("\n--- Decision Tree Classification ---")
+    print("\n--- Random Forest Classification ---")
     print(train_classification())

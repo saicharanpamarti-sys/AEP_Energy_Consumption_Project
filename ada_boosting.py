@@ -1,19 +1,35 @@
-from pathlib import Path
+"""
+AdaBoost Model for AEP Energy Consumption Project.
+Implements AdaBoostRegressor and AdaBoostClassifier.
+"""
 
+from pathlib import Path
+import time
+import math
 import pandas as pd
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    f1_score,
+    mean_absolute_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 BASE_DIR = Path(__file__).resolve().parent
+DATA_PATH = BASE_DIR / "data" / "AEP_hourly_preprocessed.csv"
 RAW_DATA_PATH = BASE_DIR / "data" / "AEP_hourly.csv"
-PROCESSED_DATA_PATH = BASE_DIR / "data" / "AEP_hourly_preprocessed.csv"
+FEATURES = ["Hour", "Month", "DayOfWeek", "IsWeekend"]
 
 
 def load_training_data():
-    if PROCESSED_DATA_PATH.exists():
-        df = pd.read_csv(PROCESSED_DATA_PATH)
+    if DATA_PATH.exists():
+        df = pd.read_csv(DATA_PATH)
     else:
         df = pd.read_csv(RAW_DATA_PATH)
         df["Datetime"] = pd.to_datetime(df["Datetime"], errors="coerce")
@@ -27,40 +43,94 @@ def load_training_data():
     if "HighDemand" not in df.columns:
         df["HighDemand"] = (df["AEP_MW"] >= df["AEP_MW"].median()).astype(int)
 
-    features = ["Hour", "Month", "DayOfWeek", "IsWeekend"]
-    X = df[features]
-    y = df["HighDemand"].astype(int)
-    return X, y
+    X = df[FEATURES]
+    y_reg = df["AEP_MW"]
+    y_clf = df["HighDemand"].astype(int)
+    return X, y_reg, y_clf
 
 
-def train_model():
-    X, y = load_training_data()
+def train_regression():
+    X, y_reg, _ = load_training_data()
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y_reg, test_size=0.2, random_state=42
+    )
+
+    model = AdaBoostRegressor(
+        n_estimators=50,
+        learning_rate=0.1,
+        random_state=42,
+    )
+    t0 = time.time()
+    model.fit(X_train, y_train)
+    fit_time = time.time() - t0
+
+    t1 = time.time()
+    test_pred = model.predict(X_test)
+    inf_time = time.time() - t1
+    train_pred = model.predict(X_train)
+
+    return {
+        "model_name": "AdaBoost Regressor",
+        "task": "Regression",
+        "training_rows": int(len(X_train)),
+        "test_rows": int(len(X_test)),
+        "train_rmse": round(math.sqrt(mean_squared_error(y_train, train_pred)), 2),
+        "test_rmse": round(math.sqrt(mean_squared_error(y_test, test_pred)), 2),
+        "train_mae": round(mean_absolute_error(y_train, train_pred), 2),
+        "test_mae": round(mean_absolute_error(y_test, test_pred), 2),
+        "train_r2": round(r2_score(y_train, train_pred), 4),
+        "test_r2": round(r2_score(y_test, test_pred), 4),
+        "oob_score": None,
+        "train_time_sec": round(fit_time, 3),
+        "inference_time_sec": round(inf_time, 4),
+    }
+
+
+def train_classification():
+    X, _, y_clf = load_training_data()
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y_clf, test_size=0.2, random_state=42, stratify=y_clf
     )
 
     model = AdaBoostClassifier(
-        estimator=DecisionTreeClassifier(max_depth=1),
-        n_estimators=100,
+        estimator=DecisionTreeClassifier(max_depth=2),
+        n_estimators=50,
         learning_rate=0.5,
         random_state=42,
     )
+    t0 = time.time()
     model.fit(X_train, y_train)
+    fit_time = time.time() - t0
 
-    train_pred = model.predict(X_train)
+    t1 = time.time()
     test_pred = model.predict(X_test)
+    inf_time = time.time() - t1
+    train_pred = model.predict(X_train)
 
-    result = {
+    return {
         "model_name": "AdaBoost",
-        "train_accuracy": float(accuracy_score(y_train, train_pred)),
-        "test_accuracy": float(accuracy_score(y_test, test_pred)),
-        "confusion_matrix": confusion_matrix(y_test, test_pred).tolist(),
+        "task": "Classification",
         "training_rows": int(len(X_train)),
         "test_rows": int(len(X_test)),
+        "train_accuracy": round(accuracy_score(y_train, train_pred), 4),
+        "test_accuracy": round(accuracy_score(y_test, test_pred), 4),
+        "precision": round(precision_score(y_test, test_pred, zero_division=0), 4),
+        "recall": round(recall_score(y_test, test_pred, zero_division=0), 4),
+        "f1_score": round(f1_score(y_test, test_pred, zero_division=0), 4),
+        "oob_score": None,
+        "confusion_matrix": confusion_matrix(y_test, test_pred).tolist(),
+        "train_time_sec": round(fit_time, 3),
+        "inference_time_sec": round(inf_time, 4),
     }
-    return result
+
+
+def train_model():
+    """Backward-compatible classification method."""
+    return train_classification()
 
 
 if __name__ == "__main__":
-    result = train_model()
-    print(result)
+    print("--- AdaBoost Regression ---")
+    print(train_regression())
+    print("\n--- AdaBoost Classification ---")
+    print(train_classification())

@@ -38,9 +38,11 @@
                 <a href="{{ url_for('logistic_regression') }}" class="menu-item {% if active == 'logistic-regression' %}active{% endif %}">Logistic Regression</a>
             </li>
             <li>
-                <a href="{{ url_for('decision_tree') }}" class="menu-item {% if active == 'decision-tree' %}active{% endif %}">Decision Tree</a>
+                <a href="{{ url_for('models_suite') }}" class="menu-item {% if active == 'models' %}active{% endif %}">Tree & Ensemble Suite</a>
             </li>
-            <li class="menu-item disabled">Prediction (coming soon)</li>
+            <li>
+                <a href="{{ url_for('predict_page') }}" class="menu-item {% if active == 'prediction' %}active{% endif %}">Interactive Prediction</a>
+            </li>
         </ul>
     </nav>
 
