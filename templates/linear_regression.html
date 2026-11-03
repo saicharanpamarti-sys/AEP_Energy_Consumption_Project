@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Linear Regression - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning Pipeline &bull; Step 4</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Linear Regression Baseline Suite</h2>
+    <p class="text-muted mb-0">Benchmarking static calendar models against autoregressive time-lagged architectures on continuous load forecasting (MW).</p>
+  </div>
+  <div>
+    <a href="{{ url_for('logistic_regression') }}" class="btn btn-emerald">
+      Proceed to Logistic Regression &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- KPI Header: Two Distinct Side-by-Side Performance Cards -->
+<div class="row g-4 mb-4">
+  <!-- Card 1: Calendar Baseline -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100 border-start border-4 border-danger shadow-sm">
+      <div class="card-custom-header d-flex justify-content-between align-items-center">
+        <div>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-2">Baseline</span>
+          <span class="fw-bold fs-6">Calendar Baseline Model</span>
+        </div>
+        <span class="badge bg-light text-muted border">High Bias / Underfitting</span>
+      </div>
+      <div class="card-custom-body">
+        <div class="mb-3">
+          <small class="text-muted fw-bold d-block mb-1">Features Used:</small>
+          <div class="d-flex flex-wrap gap-1">
+            {% for f in calendar_baseline.features %}
+              <span class="badge bg-secondary-subtle text-secondary border">{{ f }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row g-2 text-center mb-3">
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test R²</small>
+              <strong class="fs-5 text-danger">{{ '%.4f' % calendar_baseline.test_r2 }}</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test RMSE</small>
+              <strong class="fs-6 text-danger">{{ '{:,.2f}'.format(calendar_baseline.test_rmse) }} MW</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test MAE</small>
+              <strong class="fs-6 text-danger">{{ '{:,.2f}'.format(calendar_baseline.test_mae) }} MW</strong>
+            </div>
+          </div>
+        </div>
+        <div class="p-2 rounded bg-light small text-muted border">
+          <i class="bi bi-exclamation-triangle-fill text-warning me-1"></i>
+          <strong>Key Limitation:</strong> Static calendar coordinates capture average diurnal profiles but are blind to meteorological anomalies and real-time thermal inertia.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Autoregressive Model with Lags -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100 border-start border-4 border-success shadow-sm">
+      <div class="card-custom-header d-flex justify-content-between align-items-center">
+        <div>
+          <span class="badge bg-success-subtle text-success border border-success-subtle me-2">Best Performer</span>
+          <span class="fw-bold fs-6">Autoregressive Model (With Lags)</span>
+        </div>
+        <span class="badge bg-success text-white">Low Bias &bull; Converged</span>
+      </div>
+      <div class="card-custom-body">
+        <div class="mb-3">
+          <small class="text-muted fw-bold d-block mb-1">Features Used:</small>
+          <div class="d-flex flex-wrap gap-1">
+            {% for f in autoregressive_model.features %}
+              <span class="badge bg-primary-subtle text-primary border">{{ f }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row g-2 text-center mb-3">
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test R²</small>
+              <strong class="fs-5 text-success">{{ '%.4f' % autoregressive_model.test_r2 }}</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test RMSE</small>
+              <strong class="fs-6 text-success">{{ '{:,.2f}'.format(autoregressive_model.test_rmse) }} MW</strong>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test MAE</small>
+              <strong class="fs-6 text-success">{{ '{:,.2f}'.format(autoregressive_model.test_mae) }} MW</strong>
+            </div>
+          </div>
+        </div>
+        <div class="p-2 rounded bg-light small text-muted border">
+          <i class="bi bi-check-circle-fill text-success me-1"></i>
+          <strong>Key Strength:</strong> Adding <code>lag_1</code> (prior hour load) and <code>lag_24</code> (prior day same hour) reduces RMSE by <strong>77.1%</strong> (from 2,234 to 512 MW).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Clean Benchmark Comparison Table -->
+<div class="card-custom mb-4 shadow-sm border">
+  <div class="card-custom-header d-flex justify-content-between align-items-center">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table me-2 text-primary"></i> Linear Regression Architecture Benchmark
+    </span>
+    <span class="badge bg-light text-dark border">Test Set: 24,255 Records (20% Chronological Split)</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Model Architecture</th>
+            <th>Features Used</th>
+            <th>Test RMSE (MW) &darr;</th>
+            <th>Test MAE (MW) &darr;</th>
+            <th>Test R² &uarr;</th>
+            <th>Train R²</th>
+            <th>Key Insight</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in models %}
+            <tr {% if m.type == 'Autoregressive (Lags)' %}class="table-success-subtle"{% endif %}>
+              <td>
+                <strong class="text-dark">{{ m.name }}</strong>
+                <span class="d-block small text-muted">{{ m.type }}</span>
+              </td>
+              <td>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for feat in m.features %}
+                    <span class="badge bg-light text-dark border small">{{ feat }}</span>
+                  {% endfor %}
+                </div>
+              </td>
+              <td>
+                <span class="fw-bold {% if m.test_rmse < 1000 %}text-success{% else %}text-danger{% endif %}">
+                  {{ '{:,.2f}'.format(m.test_rmse) }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-bold">{{ '{:,.2f}'.format(m.test_mae) }}</span>
+              </td>
+              <td>
+                <span class="badge {% if m.test_r2 > 0.9 %}bg-success{% elif m.test_r2 > 0.2 %}bg-warning text-dark{% else %}bg-danger{% endif %} fs-6">
+                  {{ '%.4f' % m.test_r2 }}
+                </span>
+              </td>
+              <td class="text-muted">{{ '%.4f' % m.train_r2 }}</td>
+              <td>
+                <small class="text-muted">{{ m.insight }}</small>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic Visualizations Suite -->
+<div class="card-custom mb-4 shadow-sm border">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-graph-up me-2 text-primary"></i> Linear Regression Diagnostic Visualizations
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Diagnostic Analytics</span>
+  </div>
+  <div class="card-custom-body p-4">
+    <div class="row g-4">
+      
+      <!-- Graph 1: Learning Curve -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">1. Sample Learning Curves: Underfitting Plateau vs. Convergence</h6>
+          <img src="{{ url_for('static', filename='charts/lr_learning_curve.png') }}" class="img-fluid rounded mb-3 border" alt="Learning Curve">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> The Calendar Baseline exhibits a severe high-bias plateau at R² &approx; 0.26 across sample sizes, confirming structural underfitting. Conversely, the Autoregressive model rapidly converges at R² &approx; 0.96 with negligible variance gap between train and test.
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph 2: 7-Day Time Series Overlay -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">2. Time-Series Overlay: 168-Hour (7-Day) Test Window</h6>
+          <img src="{{ url_for('static', filename='charts/lr_actual_vs_pred.png') }}" class="img-fluid rounded mb-3 border" alt="Actual vs Predicted Overlay">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> Visualizing a continuous 7-day forecast demonstrates that the Autoregressive model tightly tracks daily crests and nightly troughs, while the Calendar Baseline severely clips peak heights and lags weather-driven swings.
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph 3: Residual Normality Distribution -->
+      <div class="col-12">
+        <div class="border rounded p-3 bg-white shadow-sm">
+          <h6 class="fw-bold mb-2">3. Error Normality: Residual Distribution Histogram</h6>
+          <div class="text-center mb-3">
+            <img src="{{ url_for('static', filename='charts/lr_residuals.png') }}" class="img-fluid rounded border" alt="Residual Distribution" style="max-height: 380px;">
+          </div>
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> Autoregressive prediction errors follow a tight, zero-centered Gaussian distribution (&sigma; &approx; 512 MW). The Calendar Baseline errors exhibit heavy dispersion (&sigma; &approx; 2,234 MW) with elongated tails during peak demand events.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('logistic_regression') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Logistic Regression &rarr;
+  </a>
+</div>
+{% endblock %}

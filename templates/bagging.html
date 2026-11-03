@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Bagging Techniques - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning &bull; Bagging Ensemble Architecture</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Random Forest & Bagging Techniques</h2>
+    <p class="text-muted mb-0">Bootstrap Aggregation (Bagging) with Out-Of-Bag (OOB) evaluation and variance reduction.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('boosting_route') }}" class="btn btn-emerald">
+      Proceed to Boosting Techniques &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Key Strength Callout Banner -->
+<div class="key-strength-banner mb-3">
+  <div class="fs-3 text-warning">
+    <i class="bi bi-collection-fill"></i>
+  </div>
+  <div>
+    <div class="key-strength-title">Key Architectural Strength for Grid Operations</div>
+    <p class="key-strength-text">
+      <strong>Variance Reduction & Native Out-Of-Bag (OOB) Cross-Validation:</strong> By training de-correlated decision trees on independent bootstrap samples, Random Forest averages out individual tree variance without inflating bias. Crucially, with <code>oob_score=True</code>, the unselected observations per tree (approximately 36.8%) serve as an unbiased internal validation set, eliminating the computational need for separate cross-validation folds.
+    </p>
+  </div>
+</div>
+
+<!-- Autoregressive Feature Badges -->
+<div class="mb-4">
+  <span class="small fw-bold text-muted text-uppercase me-2">Autoregressive Feature Set (5 Features):</span>
+  {% for feat in regression.features_used %}
+    <span class="badge-pill-feature">
+      <i class="bi bi-check2 text-success me-1"></i> {{ feat }}
+    </span>
+  {% endfor %}
+  <span class="badge-pill-feature bg-light text-dark">
+    Chronological 80/20 Split (97,018 Train / 24,255 Test)
+  </span>
+</div>
+
+<!-- OOB & Generalization Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">OOB R² Generalization</div>
+      <div class="metric-box-value text-purple" style="color: var(--accent-purple);">{{ '%.4f' % regression.oob_score }}</div>
+      <div class="metric-box-sub">
+        <span class="badge badge-oob">oob_score=True Active</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">OOB Classification Accuracy</div>
+      <div class="metric-box-value text-purple" style="color: var(--accent-purple);">{{ '%.2f' % (classification.oob_score * 100) }}%</div>
+      <div class="metric-box-sub">Unbiased internal validation</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Test RMSE (Lowest in Trees)</div>
+      <div class="metric-box-value text-success">{{ '%.2f' % regression.test_rmse }} MW</div>
+      <div class="metric-box-sub">MAE: {{ '%.2f' % regression.test_mae }} MW</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Parallel Training Time</div>
+      <div class="metric-box-value text-primary">{{ '%.3f' % regression.train_time_sec }}s</div>
+      <div class="metric-box-sub">Accelerated with <code>n_jobs=-1</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- OOB Curve & Variance Mechanism Row -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-graph-up me-2 text-primary"></i> Out-Of-Bag (OOB) Generalization vs. Ensemble Size
+        </span>
+        <span class="badge bg-light text-dark border">Convergence Curve</span>
+      </div>
+      <div class="card-custom-body text-center">
+        <img src="{{ url_for('static', filename='charts/rf_oob_curve.png') }}" class="chart-img-fluid mb-2" alt="Random Forest OOB Curve">
+        <p class="small text-muted mb-0 text-start">
+          As ensemble size increases from 10 to 50 trees, the Out-of-Bag generalization score stabilizes around <strong>0.9902</strong> (Regression R²) and <strong>96.94%</strong> (Classification Accuracy), demonstrating robust convergence and asymptotic variance reduction.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-shield-check me-2 text-success"></i> Variance Reduction for AEP Peak Load Surges
+        </span>
+        <span class="badge bg-success-subtle text-success">Grid Engineering</span>
+      </div>
+      <div class="card-custom-body">
+        <p class="small text-muted mb-3">
+          Why Random Forest excels for American Electric Power hourly dispatch over individual decision trees:
+        </p>
+        <ul class="text-muted ps-3 mb-0 small" style="line-height: 1.8;">
+          <li><strong>Subspace Randomization:</strong> Selecting random feature subsets at each node decorrelates individual trees, dramatically shrinking variance on correlated lag variables.</li>
+          <li><strong>Large Forest Convergence:</strong> As more bootstrap trees are aggregated, the variance of the average prediction shrinks toward zero without inflating bias, preventing overfitting.</li>
+          <li><strong>Outlier Damping:</strong> Extreme temperature load spikes during winter freezes and summer heatwaves are smoothed across the forest, delivering a test RMSE of <strong>242.41 MW</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed Metrics & Confusion Matrix -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table me-2 text-success"></i> Random Forest Full Performance Audit Table
+    </span>
+    <span class="badge bg-light text-dark border">Test Set: 24,255 Records</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom mb-0">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Train Metric</th>
+            <th>Test Metric</th>
+            <th>OOB Score</th>
+            <th>Fit Time (s)</th>
+            <th>Inference Time (s)</th>
+            <th>Evaluation Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Continuous Regression (AEP_MW)</strong></td>
+            <td>Train R² = {{ '%.4f' % regression.train_r2 }}</td>
+            <td><strong>Test R² = {{ '%.4f' % regression.test_r2 }}</strong><br><small class="text-muted">RMSE = {{ '%.2f' % regression.test_rmse }} MW</small></td>
+            <td><span class="badge badge-oob">{{ '%.4f' % regression.oob_score }}</span></td>
+            <td>{{ '%.3f' % regression.train_time_sec }}s</td>
+            <td>{{ '%.4f' % regression.inference_time_sec }}s</td>
+            <td><span class="badge bg-success-subtle text-success">Top Regressor</span></td>
+          </tr>
+          <tr>
+            <td><strong>High-Demand Classification (High_Demand)</strong></td>
+            <td>Train Acc = {{ '%.2f' % (classification.train_accuracy * 100) }}%</td>
+            <td><strong>Test Acc = {{ '%.2f' % (classification.test_accuracy * 100) }}%</strong><br><small class="text-muted">F1 = {{ '%.4f' % classification.f1_score }}</small></td>
+            <td><span class="badge badge-oob">{{ '%.2f' % (classification.oob_score * 100) }}%</span></td>
+            <td>{{ '%.3f' % classification.train_time_sec }}s</td>
+            <td>{{ '%.4f' % classification.inference_time_sec }}s</td>
+            <td><span class="badge bg-success-subtle text-success">Highest F1-Score (0.8096)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic Visualizations: Estimator Curve & Feature Importance Comparison -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card-custom h-100 shadow-sm border">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-graph-down me-2 text-primary"></i> Number of Estimators vs. OOB / Test Error
+        </span>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Variance Reduction</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/bagging_estimator_curve.png') }}" class="img-fluid rounded border mb-2" alt="Estimator Error Curve">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Asymptotic Convergence:</strong> As ensemble size reaches 50 trees, both Out-of-Bag (OOB) and test RMSE level off asymptotically (~1,200 MW). Adding trees beyond 50 yields marginal error reduction while increasing training compute linearly.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-custom h-100 shadow-sm border">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-bar-chart-line-fill me-2 text-success"></i> Feature Importance: Random Forest vs. Extra Trees
+        </span>
+        <span class="badge bg-success-subtle text-success border border-success-subtle">Ensemble Comparison</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/rf_feature_importance.png') }}" class="img-fluid rounded border mb-2" alt="Feature Importance Comparison">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Split Randomization:</strong> Random Forest relies predominantly on <code>Hour</code> (65%) and <code>Month</code> (22%). Extra Trees distributes split importance more uniformly across features due to random threshold selection, providing complementary variance reduction.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('boosting_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Boosting Techniques &rarr;
+  </a>
+</div>
+{% endblock %}

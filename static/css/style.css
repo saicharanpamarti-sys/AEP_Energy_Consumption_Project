@@ -1,0 +1,418 @@
+/* AEP Energy Consumption Project - Modern Bootstrap 5 Stylesheet */
+
+:root {
+  --primary-emerald: #059669;
+  --primary-dark: #064e3b;
+  --primary-light: #ecfdf5;
+  --primary-border: #a7f3d0;
+  --accent-blue: #0284c7;
+  --accent-amber: #d97706;
+  --accent-purple: #7c3aed;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8fafc;
+  color: var(--slate-800);
+  min-height: 100vh;
+}
+
+/* Top Navbar */
+.navbar-custom {
+  background: #ffffff;
+  border-bottom: 1px solid var(--slate-200);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 0.75rem 1.5rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--primary-dark) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Layout & Sidebar Navigation */
+.app-layout {
+  display: flex;
+  min-height: calc(100vh - 61px);
+}
+
+.sidebar {
+  position: fixed;
+  top: 61px;
+  bottom: 0;
+  left: 0;
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--slate-200);
+  padding: 1.25rem 0.75rem 2rem;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.main-content {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  padding: 1.75rem 2rem;
+  min-height: calc(100vh - 61px);
+  background-color: #f8fafc;
+}
+
+@media (max-width: 991.98px) {
+  .app-layout {
+    display: block;
+  }
+  .sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+  }
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1.25rem 1rem;
+  }
+}
+
+.sidebar-section-heading {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  padding: 0.75rem 0.75rem 0.35rem 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--slate-600);
+  border-radius: 8px;
+  transition: all 0.15s ease-in-out;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+
+.sidebar-nav .nav-link:hover {
+  color: var(--primary-dark);
+  background-color: var(--primary-light);
+}
+
+.sidebar-nav .nav-link.active {
+  color: var(--primary-dark);
+  background: #ecfdf5;
+  font-weight: 700;
+  border-left: 3px solid var(--primary-emerald);
+}
+
+.sidebar-nav .nav-link.disabled-link {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Cards & Containers */
+.card-custom {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.card-custom-header {
+  background: #ffffff;
+  border-bottom: 1px solid var(--slate-200);
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-custom-body {
+  padding: 1.25rem;
+}
+
+/* Metric Stats Cards */
+.metric-box {
+  background: #ffffff;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 1.1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.metric-box-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.metric-box-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  line-height: 1.2;
+}
+
+.metric-box-sub {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.35rem;
+}
+
+/* Key Strength Banner */
+.key-strength-banner {
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+  border: 1px solid var(--primary-border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.key-strength-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.key-strength-text {
+  font-size: 0.92rem;
+  color: #064e3b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Badges */
+.badge-pill-feature {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.7rem;
+  border-radius: 50rem;
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+  display: inline-block;
+}
+
+.badge-model-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+.badge-tree {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-bagging {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-boosting {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-oob {
+  background: #ede9fe;
+  color: #6d28d9;
+  font-weight: 800;
+}
+
+.badge-target {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+}
+
+/* Tabs */
+.nav-tabs-custom {
+  border-bottom: 2px solid var(--slate-200);
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.nav-tabs-custom .nav-link {
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--slate-600);
+  padding: 0.65rem 1.1rem;
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.nav-tabs-custom .nav-link:hover {
+  color: var(--primary-emerald);
+  border-color: var(--slate-200) var(--slate-200) transparent;
+}
+
+.nav-tabs-custom .nav-link.active {
+  color: var(--primary-dark);
+  background: #ffffff;
+  border-color: var(--slate-200) var(--slate-200) #ffffff;
+  border-top: 3px solid var(--primary-emerald);
+  font-weight: 700;
+}
+
+/* Tables */
+.table-custom {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+
+.table-custom thead th {
+  background-color: var(--slate-50);
+  color: var(--slate-700);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--slate-200);
+  white-space: nowrap;
+  padding: 0.75rem 1rem;
+}
+
+.table-custom tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.table-custom tbody tr:hover {
+  background-color: #fbfdfc;
+}
+
+/* Confusion Matrix Box */
+.cm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.cm-cell {
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.cm-good {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.cm-bad {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Buttons */
+.btn-emerald {
+  background-color: var(--primary-emerald);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1.25rem;
+  transition: background-color 0.15s;
+}
+
+.btn-emerald:hover {
+  background-color: #047857;
+  color: #ffffff;
+}
+
+.btn-outline-custom {
+  background-color: #ffffff;
+  color: var(--slate-700);
+  border: 1px solid var(--slate-300);
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.15s;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--slate-50);
+  border-color: var(--slate-400);
+  color: var(--slate-900);
+}
+
+/* Chart images */
+.chart-img-fluid {
+  border-radius: 8px;
+  border: 1px solid var(--slate-200);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prediction Result Callout */
+.prediction-banner {
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.prediction-banner.high-demand {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+}
+
+.prediction-banner.normal-demand {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}

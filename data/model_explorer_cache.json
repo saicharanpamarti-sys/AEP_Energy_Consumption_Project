@@ -1,0 +1,966 @@
+{
+  "dataset_rows": 121101,
+  "train_rows": 96880,
+  "test_rows": 24221,
+  "features_used": [
+    "hour",
+    "dayofweek",
+    "month",
+    "is_weekend",
+    "quarter",
+    "lag_1",
+    "lag_24",
+    "lag_168",
+    "rolling_mean_24h",
+    "rolling_std_24h"
+  ],
+  "feature_count": 10,
+  "temporal_features": [
+    "hour",
+    "dayofweek",
+    "month",
+    "is_weekend",
+    "quarter"
+  ],
+  "lag_features": [
+    "lag_1",
+    "lag_24",
+    "lag_168"
+  ],
+  "rolling_features": [
+    "rolling_mean_24h",
+    "rolling_std_24h"
+  ],
+  "target_variable": "AEP_MW",
+  "cached_at": "2026-10-07 11:51:26",
+  "models": [
+    {
+      "slug": "decision-tree",
+      "title": "Decision Tree",
+      "class_name": "DecisionTreeRegressor / DecisionTreeClassifier",
+      "key_strength": "Fast, interpretable white-box baseline that captures non-linear step-function thresholds across diurnal peak-demand hours with zero feature scaling required.",
+      "feature_selection_strategy": "Greedy split over all 10 features at each tree node, selecting the split that maximizes variance reduction.",
+      "standout_metric": "Instant Single-Tree (0.57s)",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9917,
+        "test_r2": 0.9888,
+        "train_accuracy": 97.12,
+        "test_accuracy": 97.01,
+        "train_rmse": 235.71,
+        "test_rmse": 258.59,
+        "train_mae": 165.44,
+        "test_mae": 190.82,
+        "training_time_sec": 0.57
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18781.6,
+          "abs_error": 663.6,
+          "pct_error": 3.66
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17831.1,
+          "abs_error": 158.1,
+          "pct_error": 0.89
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17537.8,
+          "abs_error": 234.8,
+          "pct_error": 1.36
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 17092.9,
+          "abs_error": 91.9,
+          "pct_error": 0.54
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15901.8,
+          "abs_error": 62.2,
+          "pct_error": 0.39
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14696.1,
+          "abs_error": 112.9,
+          "pct_error": 0.76
+        }
+      ],
+      "accent_color": "#2563eb",
+      "rank": 5
+    },
+    {
+      "slug": "random-forest",
+      "title": "Random Forest",
+      "class_name": "RandomForestRegressor / RandomForestClassifier (oob_score=True)",
+      "key_strength": "Bagging ensemble averaging decorrelated trees with Out-Of-Bag (OOB) internal cross-validation; highly resilient against noise, extreme outliers, and overfitting.",
+      "feature_selection_strategy": "Random feature subsampling (sqrt/p) at each split, decorrelating individual decision trees.",
+      "standout_metric": "Top OOB Score: 0.9947",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9978,
+        "test_r2": 0.9936,
+        "train_accuracy": 98.45,
+        "test_accuracy": 97.69,
+        "train_rmse": 120.58,
+        "test_rmse": 195.99,
+        "train_mae": 84.13,
+        "test_mae": 143.71,
+        "training_time_sec": 4.81,
+        "oob_score": 0.9947
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18268.2,
+          "abs_error": 150.2,
+          "pct_error": 0.83
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17725.3,
+          "abs_error": 52.3,
+          "pct_error": 0.3
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17443.5,
+          "abs_error": 140.5,
+          "pct_error": 0.81
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 17109.6,
+          "abs_error": 108.6,
+          "pct_error": 0.64
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15830.3,
+          "abs_error": 133.7,
+          "pct_error": 0.84
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14674.9,
+          "abs_error": 134.1,
+          "pct_error": 0.91
+        }
+      ],
+      "accent_color": "#059669",
+      "rank": 1
+    },
+    {
+      "slug": "adaboost",
+      "title": "AdaBoost",
+      "class_name": "AdaBoostRegressor / AdaBoostClassifier",
+      "key_strength": "Adaptive sequential boosting that iteratively reweights hardest-to-predict extreme peak load timestamps, converting weak base learners into an agile forecaster.",
+      "feature_selection_strategy": "Global feature evaluation weighted by sample pseudo-residuals across successive decision trees.",
+      "standout_metric": "Iterative Hard-Sample Reweighting",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.974,
+        "test_r2": 0.9728,
+        "train_accuracy": 94.57,
+        "test_accuracy": 94.93,
+        "train_rmse": 417.82,
+        "test_rmse": 403.31,
+        "train_mae": 323.38,
+        "test_mae": 320.86,
+        "training_time_sec": 10.66
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18505.1,
+          "abs_error": 387.1,
+          "pct_error": 2.14
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 18008.6,
+          "abs_error": 335.6,
+          "pct_error": 1.9
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17695.4,
+          "abs_error": 392.4,
+          "pct_error": 2.27
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16620.2,
+          "abs_error": 380.8,
+          "pct_error": 2.24
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 16399.0,
+          "abs_error": 435.0,
+          "pct_error": 2.72
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14675.4,
+          "abs_error": 133.6,
+          "pct_error": 0.9
+        }
+      ],
+      "accent_color": "#d97706",
+      "rank": 6
+    },
+    {
+      "slug": "gradient-boosting",
+      "title": "Gradient Boosting",
+      "class_name": "GradientBoostingRegressor / GradientBoostingClassifier",
+      "key_strength": "Stage-wise residual gradient descent optimization directly minimizing MSE loss; captures subtle seasonal transitions and continuous daily load curvature.",
+      "feature_selection_strategy": "Greedy coordinate descent in function space over all features, fitting subsequent trees to pseudo-residuals.",
+      "standout_metric": "Stage-Wise Gradient Residuals (R\u00b2 0.9903)",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9918,
+        "test_r2": 0.9903,
+        "train_accuracy": 97.06,
+        "test_accuracy": 97.09,
+        "train_rmse": 235.17,
+        "test_rmse": 240.96,
+        "train_mae": 174.4,
+        "test_mae": 184.8,
+        "training_time_sec": 17.51
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18489.7,
+          "abs_error": 371.7,
+          "pct_error": 2.05
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17821.7,
+          "abs_error": 148.7,
+          "pct_error": 0.84
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17407.2,
+          "abs_error": 104.2,
+          "pct_error": 0.6
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16878.8,
+          "abs_error": 122.2,
+          "pct_error": 0.72
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15894.5,
+          "abs_error": 69.5,
+          "pct_error": 0.44
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14628.6,
+          "abs_error": 180.4,
+          "pct_error": 1.22
+        }
+      ],
+      "accent_color": "#7c3aed",
+      "rank": 4
+    },
+    {
+      "slug": "xgboost",
+      "title": "XGBoost",
+      "class_name": "xgb.XGBRegressor / xgb.XGBClassifier",
+      "key_strength": "Regularized tree boosting with 2nd-order Taylor loss expansion, weighted quantile sketches, and extreme cache-optimized parallel execution.",
+      "feature_selection_strategy": "Histogram-based column subsampling per tree/split combined with exact L1/L2 leaf weight regularization.",
+      "standout_metric": "Lowest Test RMSE & Top R\u00b2",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9929,
+        "test_r2": 0.9907,
+        "train_accuracy": 97.36,
+        "test_accuracy": 97.18,
+        "train_rmse": 217.96,
+        "test_rmse": 235.73,
+        "train_mae": 162.67,
+        "test_mae": 181.06,
+        "training_time_sec": 0.58
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18489.8,
+          "abs_error": 371.8,
+          "pct_error": 2.05
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17701.2,
+          "abs_error": 28.2,
+          "pct_error": 0.16
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17388.1,
+          "abs_error": 85.1,
+          "pct_error": 0.49
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16963.9,
+          "abs_error": 37.1,
+          "pct_error": 0.22
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15689.4,
+          "abs_error": 274.6,
+          "pct_error": 1.72
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14554.9,
+          "abs_error": 254.1,
+          "pct_error": 1.72
+        }
+      ],
+      "accent_color": "#dc2626",
+      "rank": 2
+    },
+    {
+      "slug": "lightgbm",
+      "title": "LightGBM",
+      "class_name": "lgb.LGBMRegressor / lgb.LGBMClassifier",
+      "key_strength": "Gradient-based One-Side Sampling (GOSS) and Exclusive Feature Bundling (EFB) with leaf-wise tree growth, achieving blazing fast training and top-tier accuracy.",
+      "feature_selection_strategy": "Column subsampling + Histogram binning of continuous features into discrete bins with Exclusive Feature Bundling (EFB).",
+      "standout_metric": "Fastest Training: 0.25s",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9925,
+        "test_r2": 0.9905,
+        "train_accuracy": 97.24,
+        "test_accuracy": 97.12,
+        "train_rmse": 224.27,
+        "test_rmse": 237.77,
+        "train_mae": 168.0,
+        "test_mae": 183.82,
+        "training_time_sec": 0.25
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18432.0,
+          "abs_error": 314.0,
+          "pct_error": 1.73
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17733.1,
+          "abs_error": 60.1,
+          "pct_error": 0.34
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17414.1,
+          "abs_error": 111.1,
+          "pct_error": 0.64
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16888.0,
+          "abs_error": 113.0,
+          "pct_error": 0.66
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15781.5,
+          "abs_error": 182.5,
+          "pct_error": 1.14
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14610.6,
+          "abs_error": 198.4,
+          "pct_error": 1.34
+        }
+      ],
+      "accent_color": "#0891b2",
+      "rank": 3
+    }
+  ],
+  "ranked_models": [
+    {
+      "slug": "random-forest",
+      "title": "Random Forest",
+      "class_name": "RandomForestRegressor / RandomForestClassifier (oob_score=True)",
+      "key_strength": "Bagging ensemble averaging decorrelated trees with Out-Of-Bag (OOB) internal cross-validation; highly resilient against noise, extreme outliers, and overfitting.",
+      "feature_selection_strategy": "Random feature subsampling (sqrt/p) at each split, decorrelating individual decision trees.",
+      "standout_metric": "Top OOB Score: 0.9947",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9978,
+        "test_r2": 0.9936,
+        "train_accuracy": 98.45,
+        "test_accuracy": 97.69,
+        "train_rmse": 120.58,
+        "test_rmse": 195.99,
+        "train_mae": 84.13,
+        "test_mae": 143.71,
+        "training_time_sec": 4.81,
+        "oob_score": 0.9947
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18268.2,
+          "abs_error": 150.2,
+          "pct_error": 0.83
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17725.3,
+          "abs_error": 52.3,
+          "pct_error": 0.3
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17443.5,
+          "abs_error": 140.5,
+          "pct_error": 0.81
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 17109.6,
+          "abs_error": 108.6,
+          "pct_error": 0.64
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15830.3,
+          "abs_error": 133.7,
+          "pct_error": 0.84
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14674.9,
+          "abs_error": 134.1,
+          "pct_error": 0.91
+        }
+      ],
+      "accent_color": "#059669",
+      "rank": 1
+    },
+    {
+      "slug": "xgboost",
+      "title": "XGBoost",
+      "class_name": "xgb.XGBRegressor / xgb.XGBClassifier",
+      "key_strength": "Regularized tree boosting with 2nd-order Taylor loss expansion, weighted quantile sketches, and extreme cache-optimized parallel execution.",
+      "feature_selection_strategy": "Histogram-based column subsampling per tree/split combined with exact L1/L2 leaf weight regularization.",
+      "standout_metric": "Lowest Test RMSE & Top R\u00b2",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9929,
+        "test_r2": 0.9907,
+        "train_accuracy": 97.36,
+        "test_accuracy": 97.18,
+        "train_rmse": 217.96,
+        "test_rmse": 235.73,
+        "train_mae": 162.67,
+        "test_mae": 181.06,
+        "training_time_sec": 0.58
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18489.8,
+          "abs_error": 371.8,
+          "pct_error": 2.05
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17701.2,
+          "abs_error": 28.2,
+          "pct_error": 0.16
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17388.1,
+          "abs_error": 85.1,
+          "pct_error": 0.49
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16963.9,
+          "abs_error": 37.1,
+          "pct_error": 0.22
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15689.4,
+          "abs_error": 274.6,
+          "pct_error": 1.72
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14554.9,
+          "abs_error": 254.1,
+          "pct_error": 1.72
+        }
+      ],
+      "accent_color": "#dc2626",
+      "rank": 2
+    },
+    {
+      "slug": "lightgbm",
+      "title": "LightGBM",
+      "class_name": "lgb.LGBMRegressor / lgb.LGBMClassifier",
+      "key_strength": "Gradient-based One-Side Sampling (GOSS) and Exclusive Feature Bundling (EFB) with leaf-wise tree growth, achieving blazing fast training and top-tier accuracy.",
+      "feature_selection_strategy": "Column subsampling + Histogram binning of continuous features into discrete bins with Exclusive Feature Bundling (EFB).",
+      "standout_metric": "Fastest Training: 0.25s",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9925,
+        "test_r2": 0.9905,
+        "train_accuracy": 97.24,
+        "test_accuracy": 97.12,
+        "train_rmse": 224.27,
+        "test_rmse": 237.77,
+        "train_mae": 168.0,
+        "test_mae": 183.82,
+        "training_time_sec": 0.25
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18432.0,
+          "abs_error": 314.0,
+          "pct_error": 1.73
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17733.1,
+          "abs_error": 60.1,
+          "pct_error": 0.34
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17414.1,
+          "abs_error": 111.1,
+          "pct_error": 0.64
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16888.0,
+          "abs_error": 113.0,
+          "pct_error": 0.66
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15781.5,
+          "abs_error": 182.5,
+          "pct_error": 1.14
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14610.6,
+          "abs_error": 198.4,
+          "pct_error": 1.34
+        }
+      ],
+      "accent_color": "#0891b2",
+      "rank": 3
+    },
+    {
+      "slug": "gradient-boosting",
+      "title": "Gradient Boosting",
+      "class_name": "GradientBoostingRegressor / GradientBoostingClassifier",
+      "key_strength": "Stage-wise residual gradient descent optimization directly minimizing MSE loss; captures subtle seasonal transitions and continuous daily load curvature.",
+      "feature_selection_strategy": "Greedy coordinate descent in function space over all features, fitting subsequent trees to pseudo-residuals.",
+      "standout_metric": "Stage-Wise Gradient Residuals (R\u00b2 0.9903)",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9918,
+        "test_r2": 0.9903,
+        "train_accuracy": 97.06,
+        "test_accuracy": 97.09,
+        "train_rmse": 235.17,
+        "test_rmse": 240.96,
+        "train_mae": 174.4,
+        "test_mae": 184.8,
+        "training_time_sec": 17.51
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18489.7,
+          "abs_error": 371.7,
+          "pct_error": 2.05
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17821.7,
+          "abs_error": 148.7,
+          "pct_error": 0.84
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17407.2,
+          "abs_error": 104.2,
+          "pct_error": 0.6
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16878.8,
+          "abs_error": 122.2,
+          "pct_error": 0.72
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15894.5,
+          "abs_error": 69.5,
+          "pct_error": 0.44
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14628.6,
+          "abs_error": 180.4,
+          "pct_error": 1.22
+        }
+      ],
+      "accent_color": "#7c3aed",
+      "rank": 4
+    },
+    {
+      "slug": "decision-tree",
+      "title": "Decision Tree",
+      "class_name": "DecisionTreeRegressor / DecisionTreeClassifier",
+      "key_strength": "Fast, interpretable white-box baseline that captures non-linear step-function thresholds across diurnal peak-demand hours with zero feature scaling required.",
+      "feature_selection_strategy": "Greedy split over all 10 features at each tree node, selecting the split that maximizes variance reduction.",
+      "standout_metric": "Instant Single-Tree (0.57s)",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.9917,
+        "test_r2": 0.9888,
+        "train_accuracy": 97.12,
+        "test_accuracy": 97.01,
+        "train_rmse": 235.71,
+        "test_rmse": 258.59,
+        "train_mae": 165.44,
+        "test_mae": 190.82,
+        "training_time_sec": 0.57
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18781.6,
+          "abs_error": 663.6,
+          "pct_error": 3.66
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 17831.1,
+          "abs_error": 158.1,
+          "pct_error": 0.89
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17537.8,
+          "abs_error": 234.8,
+          "pct_error": 1.36
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 17092.9,
+          "abs_error": 91.9,
+          "pct_error": 0.54
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 15901.8,
+          "abs_error": 62.2,
+          "pct_error": 0.39
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14696.1,
+          "abs_error": 112.9,
+          "pct_error": 0.76
+        }
+      ],
+      "accent_color": "#2563eb",
+      "rank": 5
+    },
+    {
+      "slug": "adaboost",
+      "title": "AdaBoost",
+      "class_name": "AdaBoostRegressor / AdaBoostClassifier",
+      "key_strength": "Adaptive sequential boosting that iteratively reweights hardest-to-predict extreme peak load timestamps, converting weak base learners into an agile forecaster.",
+      "feature_selection_strategy": "Global feature evaluation weighted by sample pseudo-residuals across successive decision trees.",
+      "standout_metric": "Iterative Hard-Sample Reweighting",
+      "features_used": [
+        "hour",
+        "dayofweek",
+        "month",
+        "is_weekend",
+        "quarter",
+        "lag_1",
+        "lag_24",
+        "lag_168",
+        "rolling_mean_24h",
+        "rolling_std_24h"
+      ],
+      "metrics": {
+        "train_r2": 0.974,
+        "test_r2": 0.9728,
+        "train_accuracy": 94.57,
+        "test_accuracy": 94.93,
+        "train_rmse": 417.82,
+        "test_rmse": 403.31,
+        "train_mae": 323.38,
+        "test_mae": 320.86,
+        "training_time_sec": 10.66
+      },
+      "sample_preview": [
+        {
+          "datetime": "2018-08-02 19:00:00",
+          "actual_mw": 18118.0,
+          "predicted_mw": 18505.1,
+          "abs_error": 387.1,
+          "pct_error": 2.14
+        },
+        {
+          "datetime": "2018-08-02 20:00:00",
+          "actual_mw": 17673.0,
+          "predicted_mw": 18008.6,
+          "abs_error": 335.6,
+          "pct_error": 1.9
+        },
+        {
+          "datetime": "2018-08-02 21:00:00",
+          "actual_mw": 17303.0,
+          "predicted_mw": 17695.4,
+          "abs_error": 392.4,
+          "pct_error": 2.27
+        },
+        {
+          "datetime": "2018-08-02 22:00:00",
+          "actual_mw": 17001.0,
+          "predicted_mw": 16620.2,
+          "abs_error": 380.8,
+          "pct_error": 2.24
+        },
+        {
+          "datetime": "2018-08-02 23:00:00",
+          "actual_mw": 15964.0,
+          "predicted_mw": 16399.0,
+          "abs_error": 435.0,
+          "pct_error": 2.72
+        },
+        {
+          "datetime": "2018-08-03 00:00:00",
+          "actual_mw": 14809.0,
+          "predicted_mw": 14675.4,
+          "abs_error": 133.6,
+          "pct_error": 0.9
+        }
+      ],
+      "accent_color": "#d97706",
+      "rank": 6
+    }
+  ]
+}

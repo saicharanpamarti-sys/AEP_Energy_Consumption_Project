@@ -1,0 +1,130 @@
+{
+  "charts": [
+    {
+      "num": 1,
+      "filename": "eda_01_hourly_timeseries.png",
+      "title": "Hourly Demand Time Series (14-Year Full History)",
+      "category": "Historical Series",
+      "badge": "14-Year Longitudinal",
+      "caption": "Continuous daily-averaged load series across 121,273 hours (2004\u20132018). Confirms wide-sense stationarity with consistent annual sinusoidal seasonality and zero catastrophic permanent grid drift."
+    },
+    {
+      "num": 2,
+      "filename": "eda_02_missing_timestamps.png",
+      "title": "Missing Hourly Timestamps & Continuity Heatmap",
+      "category": "Data Quality",
+      "badge": "Audit Passed",
+      "caption": "Timestamp continuity exceeds 99.9% across all years. The negligible gap of ~24 hours over 14 years aligns with standard daylight saving transition intervals without impacting autoregressive learning."
+    },
+    {
+      "num": 3,
+      "filename": "eda_03_demand_distribution.png",
+      "title": "Demand Distribution Histogram with KDE & Outlier Cutoffs",
+      "category": "Statistical Distribution",
+      "badge": "Density Analysis",
+      "caption": "Displays an approximately normal distribution slightly right-skewed (+0.31). Extreme peak load demands beyond +3\u03c3 (23,281 MW) represent summer heatwaves and severe winter polar vortices."
+    },
+    {
+      "num": 4,
+      "filename": "eda_04_diurnal_load_curve.png",
+      "title": "Diurnal 24-Hour Load Curve (Mean \u00b1 1 Std Dev band)",
+      "category": "Diurnal Profile",
+      "badge": "24h Cycle",
+      "caption": "Reveals the classic bimodal diurnal load profile: base trough at 4:00 AM (12,500 MW), rapid morning industrial ramp reaching initial peak at 10:00 AM, and evening commercial/residential crest at 7:00 PM (16,800 MW)."
+    },
+    {
+      "num": 5,
+      "filename": "eda_05_weekly_profile.png",
+      "title": "Weekly Demand Profile (Monday through Sunday)",
+      "category": "Weekly Cycle",
+      "badge": "Weekday vs Weekend",
+      "caption": "Clear weekly cycle: Monday through Friday maintain sustained high loads (~16,100 MW) driven by manufacturing and commercial HVAC, while Saturday and Sunday drop by 13% to ~14,000 MW."
+    },
+    {
+      "num": 6,
+      "filename": "eda_06_monthly_boxplots.png",
+      "title": "Seasonal / Monthly Boxplot Distribution (Jan - Dec)",
+      "category": "Seasonality",
+      "badge": "Bimodal Seasons",
+      "caption": "Highlights seasonal duality: dual demand peaks emerge in July/August (summer cooling peak ~17,200 MW) and January/February (winter electric heating peak ~16,800 MW), with mild transitional troughs in April and October."
+    },
+    {
+      "num": 7,
+      "filename": "eda_07_hour_dow_heatmap.png",
+      "title": "Heatmap: Hour of Day vs. Day of Week Demand Matrix",
+      "category": "Cross-Interaction",
+      "badge": "24x7 Matrix",
+      "caption": "24x7 intensity grid: peak demand concentration occurs between Hours 11:00 and 18:00 on Tuesdays through Thursdays (dark red cells > 17,500 MW), contrasting with cool overnight troughs on Sunday mornings."
+    },
+    {
+      "num": 8,
+      "filename": "eda_08_acf_plot.png",
+      "title": "Autocorrelation Function (ACF) Plot (up to 72 Lags)",
+      "category": "Time-Series Dynamics",
+      "badge": "Autoregressive Lag",
+      "caption": "Demonstrates very slow linear decay and strong periodic harmonic spikes at exact multiples of 24 hours (Lag 24: r = 0.88, Lag 48: r = 0.83, Lag 72: r = 0.79), empirically proving the necessity of lag_24."
+    },
+    {
+      "num": 9,
+      "filename": "eda_09_pacf_plot.png",
+      "title": "Partial Autocorrelation Function (PACF) Plot",
+      "category": "Time-Series Dynamics",
+      "badge": "AR Order Selection",
+      "caption": "Sharp cutoff after Lag 1 (r \u2248 0.98) with isolated statistically significant negative rebound at Lag 2 and positive secondary peak at Lag 24, justifying AR(1) + Seasonal AR(24) specification."
+    },
+    {
+      "num": 10,
+      "filename": "eda_10_rolling_averages.png",
+      "title": "Rolling Statistics: 7-Day & 30-Day Moving Averages vs. Actual Load",
+      "category": "Trend Smoothing",
+      "badge": "Moving Averages",
+      "caption": "Demonstrates noise filtering via rolling means: the 7-day average removes diurnal flutter while preserving meteorological cold-snap surges; the 30-day average exposes seasonal heating and cooling cycles."
+    },
+    {
+      "num": 11,
+      "filename": "eda_11_annual_peak_trends.png",
+      "title": "Annual Peak Demand Trends (Year-over-Year Maximum Load)",
+      "category": "Extreme Events",
+      "badge": "Grid Stress",
+      "caption": "All-time maximum system peak occurred in 2015 reaching 25,695 MW during an unprecedented mid-winter Arctic vortex, surpassing the mean annual baseline by > 65% and highlighting grid reserve strain."
+    },
+    {
+      "num": 12,
+      "filename": "eda_12_weekend_vs_weekday_kde.png",
+      "title": "Weekend vs. Weekday Kernel Density Comparison",
+      "category": "Comparative Density",
+      "badge": "Shifted Distribution",
+      "caption": "The weekday distribution is shifted rightward by ~2,000 MW with higher variance due to commercial shift scheduling, whereas weekend density is unimodal and centered strictly around residential baseload (13,800 MW)."
+    },
+    {
+      "num": 13,
+      "filename": "eda_13_correlation_matrix.png",
+      "title": "Full Feature Pearson Correlation Heatmap Matrix",
+      "category": "Multivariate Correlation",
+      "badge": "Correlation Matrix",
+      "caption": "Quantifies dominant relationships: lag_1 (r = 0.98) and lag_24 (r = 0.88) exhibit overwhelming predictive correlation with AEP_MW. Temporal coordinates (hour, month, dayofweek) maintain near-zero mutual correlation."
+    },
+    {
+      "num": 14,
+      "filename": "eda_14_target_balance.png",
+      "title": "Target Classification Balance: Normal vs. High Demand Distribution",
+      "category": "Classification Target",
+      "badge": "50/50 Median Balance",
+      "caption": "Because High_Demand is discretized around the empirical median (15,310 MW), classes are perfectly balanced (50.0% Normal vs. 50.0% High), eliminating training bias towards a dominant class."
+    },
+    {
+      "num": 15,
+      "filename": "eda_15_seasonal_decomposition.png",
+      "title": "Seasonal Load Decomposition: Trend, Seasonality, and Residual Components",
+      "category": "Decomposition",
+      "badge": "Additive Model",
+      "caption": "Additive decomposition confirms that the deterministic 24-hour seasonal component accounts for over 70% of intra-day load swing, leaving approximately zero-mean stationary Gaussian residuals."
+    }
+  ],
+  "count": 15,
+  "total_records": 121273,
+  "mean_load": 15499.51,
+  "median_load": 15310.0,
+  "min_load": 9581.0,
+  "max_load": 25695.0
+}

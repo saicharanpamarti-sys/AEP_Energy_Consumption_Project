@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Live Demand Prediction - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning &bull; Interactive Prediction</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Real-Time Energy Demand Inference</h2>
+    <p class="text-muted mb-0">Generate instant predictions for continuous power demand (MW) or high-load classification using the approved 6-model ensemble suite.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('tree_ensembles') }}" class="btn btn-outline-custom">
+      &larr; Back to Tree & Ensemble Suite
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 justify-content-center">
+  <div class="col-lg-10">
+    <div class="card-custom">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-sliders me-2 text-primary"></i> Simulation Parameters & Feature Inputs
+        </span>
+        <span class="badge bg-light text-dark border">Inference Engine Active</span>
+      </div>
+      <div class="card-custom-body">
+        <form action="{{ url_for('predictor_route') }}" method="POST">
+          <div class="row g-3">
+            
+            <!-- Modeling Objective -->
+            <div class="col-md-6">
+              <label for="task" class="form-label fw-bold small">Prediction Objective:</label>
+              <select name="task" id="task" class="form-select">
+                <option value="regression" {% if form_values.task == 'regression' %}selected{% endif %}>
+                  Continuous Demand Forecasting (Megawatts MW)
+                </option>
+                <option value="classification" {% if form_values.task == 'classification' %}selected{% endif %}>
+                  High-Demand Binary Classification (0 / 1 Alert)
+                </option>
+              </select>
+            </div>
+
+            <!-- Algorithm Selection -->
+            <div class="col-md-6">
+              <label for="model_key" class="form-label fw-bold small">Select Model Architecture:</label>
+              <select name="model_key" id="model_key" class="form-select">
+                {% for cfg in model_configs %}
+                  <option value="{{ cfg.key }}" {% if form_values.model_key == cfg.key %}selected{% endif %}>
+                    {{ cfg.title }} ({{ cfg.category }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Hour -->
+            <div class="col-md-3">
+              <label for="hour" class="form-label fw-bold small">Hour of Day (0 &ndash; 23):</label>
+              <input type="number" id="hour" name="hour" class="form-control" min="0" max="23" value="{{ form_values.hour }}" required>
+              <div class="form-text small">e.g., 14 for 2:00 PM peak</div>
+            </div>
+
+            <!-- Month -->
+            <div class="col-md-3">
+              <label for="month" class="form-label fw-bold small">Month (1 &ndash; 12):</label>
+              <input type="number" id="month" name="month" class="form-control" min="1" max="12" value="{{ form_values.month }}" required>
+              <div class="form-text small">e.g., 7 for Summer, 1 for Winter</div>
+            </div>
+
+            <!-- Day of Week -->
+            <div class="col-md-3">
+              <label for="day_of_week" class="form-label fw-bold small">Day of Week:</label>
+              <select name="day_of_week" id="day_of_week" class="form-select">
+                <option value="0" {% if form_values.day_of_week == 0 %}selected{% endif %}>Monday (0)</option>
+                <option value="1" {% if form_values.day_of_week == 1 %}selected{% endif %}>Tuesday (1)</option>
+                <option value="2" {% if form_values.day_of_week == 2 %}selected{% endif %}>Wednesday (2)</option>
+                <option value="3" {% if form_values.day_of_week == 3 %}selected{% endif %}>Thursday (3)</option>
+                <option value="4" {% if form_values.day_of_week == 4 %}selected{% endif %}>Friday (4)</option>
+                <option value="5" {% if form_values.day_of_week == 5 %}selected{% endif %}>Saturday (5)</option>
+                <option value="6" {% if form_values.day_of_week == 6 %}selected{% endif %}>Sunday (6)</option>
+              </select>
+            </div>
+
+            <!-- Weekend Status -->
+            <div class="col-md-3">
+              <label for="is_weekend" class="form-label fw-bold small">Weekend Status:</label>
+              <select name="is_weekend" id="is_weekend" class="form-select">
+                <option value="0" {% if form_values.is_weekend == 0 %}selected{% endif %}>Weekday (0)</option>
+                <option value="1" {% if form_values.is_weekend == 1 %}selected{% endif %}>Weekend (1)</option>
+              </select>
+            </div>
+
+            <!-- Lag 1 (Autoregressive Feature) -->
+            <div class="col-md-6">
+              <label for="lag_1" class="form-label fw-bold small">
+                <i class="bi bi-clock-history text-primary me-1"></i> Lag 1 Load (Previous Hour Demand in MW):
+              </label>
+              <input type="number" id="lag_1" name="lag_1" step="0.1" class="form-control" value="{{ form_values.lag_1 }}" required>
+              <div class="form-text small">e.g., 15200 MW (Autoregressive momentum feature, r &approx; 0.98)</div>
+            </div>
+
+            <!-- Lag 24 (Autoregressive Feature) -->
+            <div class="col-md-6">
+              <label for="lag_24" class="form-label fw-bold small">
+                <i class="bi bi-calendar2-range text-primary me-1"></i> Lag 24 Load (Same Hour Yesterday Demand in MW):
+              </label>
+              <input type="number" id="lag_24" name="lag_24" step="0.1" class="form-control" value="{{ form_values.lag_24 }}" required>
+              <div class="form-text small">e.g., 15100 MW (Diurnal cycle memory feature, r &approx; 0.88)</div>
+            </div>
+
+          </div>
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-emerald px-4 py-2 fs-6">
+              <i class="bi bi-play-circle-fill me-2"></i> Compute Live Forecast
+            </button>
+          </div>
+        </form>
+
+        <!-- Prediction Result Card -->
+        {% if prediction_result %}
+          <div class="prediction-banner {% if prediction_result.is_high_demand or prediction_result.predicted_class == 1 %}high-demand{% else %}normal-demand{% endif %}">
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <span class="badge bg-white text-dark border">
+                <i class="bi bi-cpu-fill me-1"></i> Model: {{ prediction_result.model_title }}
+              </span>
+              <span class="small fw-bold">
+                {% if prediction_result.task == 'regression' %}
+                  Median Threshold: {{ prediction_result.high_demand_threshold }} MW
+                {% elif prediction_result.high_demand_probability is not none %}
+                  Confidence Probability: {{ '%.1f' % (prediction_result.high_demand_probability * 100) }}%
+                {% endif %}
+              </span>
+            </div>
+
+            {% if prediction_result.task == 'regression' %}
+              <div class="display-5 fw-bold my-2">
+                {{ '{:,.2f}'.format(prediction_result.predicted_mw) }} MW
+              </div>
+              <p class="mb-0 fs-6">
+                {% if prediction_result.is_high_demand %}
+                  <strong><i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> High Demand Warning:</strong> Projected grid load exceeds historical baseline by +{{ '{:,.2f}'.format(prediction_result.predicted_mw - prediction_result.high_demand_threshold) }} MW.
+                {% else %}
+                  <strong><i class="bi bi-check-circle-fill text-success me-1"></i> Normal Demand Operating State:</strong> Projected grid load is within standard operating thresholds.
+                {% endif %}
+              </p>
+            {% else %}
+              <div class="display-5 fw-bold my-2">
+                {{ prediction_result.class_label }}
+              </div>
+              <p class="mb-0 fs-6">
+                Predicted High-Demand Binary Output: <strong>Class {{ prediction_result.predicted_class }}</strong>
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Progression -->
+    <div class="d-flex justify-content-end mt-4 mb-4">
+      <a href="{{ url_for('clustering_route') }}" class="btn btn-emerald px-4 py-2">
+        Proceed to Unsupervised Clustering Suite &rarr;
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

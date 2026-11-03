@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Tree & Ensemble Suite - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning Pipeline &bull; Step 6</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Tree & Ensemble Model Suite</h2>
+    <p class="text-muted mb-0">Interactive 6-model tab viewer, architectural strengths, feature tags, and comprehensive benchmark comparison.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('tree_ensembles', retrain='true') }}" class="btn btn-outline-custom">
+      <i class="bi bi-arrow-repeat me-1"></i> Re-train Suite
+    </a>
+    <a href="{{ url_for('predict_page') }}" class="btn btn-emerald">
+      <i class="bi bi-cpu-fill me-1"></i> Live Prediction &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Suite Overview Metrics Grid -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Observations Evaluated</div>
+      <div class="metric-box-value text-success">{{ '{:,}'.format(benchmark.split_info.total_rows) }}</div>
+      <div class="metric-box-sub">80% Train: {{ '{:,}'.format(benchmark.split_info.train_rows) }} | 20% Test: {{ '{:,}'.format(benchmark.split_info.test_rows) }}</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Regression Target</div>
+      <div class="metric-box-value text-primary">AEP_MW</div>
+      <div class="metric-box-sub">Continuous load in Megawatts (MW)</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Classification Target</div>
+      <div class="metric-box-value text-warning">High_Demand</div>
+      <div class="metric-box-sub">&ge; {{ benchmark.split_info.median_demand_threshold }} MW (Median threshold)</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Out-Of-Bag (OOB) Status</div>
+      <div class="metric-box-value text-purple" style="color: var(--accent-purple);">oob_score=True</div>
+      <div class="metric-box-sub">Random Forest native cross-validation</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 1. Interactive 6-Model Tab Viewer -->
+<!-- ========================================================== -->
+<div class="card-custom mb-5">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-window-stack me-2 text-primary"></i> Interactive 6-Model Tab Viewer & Architecture Profiles
+    </span>
+    <span class="badge bg-light text-dark border">Click tabs to inspect model profiles</span>
+  </div>
+  <div class="card-custom-body">
+    
+    <!-- Tab Navigation Headers -->
+    <ul class="nav nav-tabs nav-tabs-custom" id="modelSuiteTabs" role="tablist">
+      {% for m in benchmark.models_detail %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link {% if loop.first %}active{% endif %}" 
+                  id="{{ m.key }}-tab" 
+                  data-bs-toggle="tab" 
+                  data-bs-target="#{{ m.key }}-pane" 
+                  type="button" 
+                  role="tab" 
+                  aria-controls="{{ m.key }}-pane" 
+                  aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+            <span class="me-1">
+              {% if m.category == 'Decision Tree' %}
+                <i class="bi bi-diagram-2 text-info"></i>
+              {% elif m.category == 'Bagging Ensemble' %}
+                <i class="bi bi-collection-fill text-warning"></i>
+              {% else %}
+                <i class="bi bi-lightning-fill text-success"></i>
+              {% endif %}
+            </span>
+            {{ m.title }}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <!-- Tab Content Panes -->
+    <div class="tab-content pt-3" id="modelSuiteTabsContent">
+      {% for m in benchmark.models_detail %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+             id="{{ m.key }}-pane" 
+             role="tabpanel" 
+             aria-labelledby="{{ m.key }}-tab" 
+             tabindex="0">
+          
+          <!-- Key Strength Banner -->
+          <div class="key-strength-banner">
+            <div class="fs-4 text-success">
+              <i class="bi bi-award-fill"></i>
+            </div>
+            <div>
+              <div class="key-strength-title">Key Architectural Strength</div>
+              <p class="key-strength-text">{{ m.key_strength }}</p>
+            </div>
+          </div>
+
+          <!-- Feature Tags / Pill Badges -->
+          <div class="mb-4">
+            <div class="small fw-bold text-muted text-uppercase mb-2">Features Used by Model:</div>
+            <div>
+              {% for feat in m.features_used %}
+                <span class="badge-pill-feature">
+                  <i class="bi bi-check2 text-success me-1"></i> {{ feat }}
+                </span>
+              {% endfor %}
+              <span class="badge-pill-feature bg-success-subtle text-success border-success-subtle">
+                <i class="bi bi-bullseye me-1"></i> Targets: AEP_MW (Reg) & High_Demand (Clf)
+              </span>
+            </div>
+          </div>
+
+          <!-- Train/Test Metric Cards Row -->
+          <div class="row g-3 mb-4">
+            <!-- Regression Card -->
+            <div class="col-lg-6">
+              <div class="border rounded p-3 h-100 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold mb-0 text-success">
+                    <i class="bi bi-graph-up me-1"></i> Regression Metrics (Continuous Load)
+                  </h6>
+                  <span class="badge bg-success-subtle text-success">MW Forecast</span>
+                </div>
+                <div class="row g-2 mb-2 text-center">
+                  <div class="col-4">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Test RMSE</small>
+                      <strong class="fs-6 text-danger">{{ '%.2f' % m.regression.test_rmse }} MW</strong>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Test MAE</small>
+                      <strong class="fs-6 text-primary">{{ '%.2f' % m.regression.test_mae }} MW</strong>
+                    </div>
+                  </div>
+                  <div class="col-4">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Test R² Score</small>
+                      <strong class="fs-6 text-success">{{ '%.4f' % m.regression.test_r2 }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between text-muted small px-1">
+                  <span>Train R²: <strong>{{ '%.4f' % m.regression.train_r2 }}</strong></span>
+                  <span>Fit: <strong>{{ '%.3f' % m.regression.train_time_sec }}s</strong></span>
+                  <span>
+                    {% if m.regression.oob_score is not none %}
+                      <span class="badge badge-oob">OOB R²: {{ '%.4f' % m.regression.oob_score }}</span>
+                    {% else %}
+                      OOB: <span class="text-muted">&mdash;</span>
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Classification Card -->
+            <div class="col-lg-6">
+              <div class="border rounded p-3 h-100 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold mb-0 text-primary">
+                    <i class="bi bi-check2-circle me-1"></i> Classification Metrics (High-Demand)
+                  </h6>
+                  <span class="badge bg-primary-subtle text-primary">Binary Alert</span>
+                </div>
+                <div class="row g-2 mb-2 text-center">
+                  <div class="col-3">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Accuracy</small>
+                      <strong class="fs-6 text-success">{{ '%.2f' % (m.classification.test_accuracy * 100) }}%</strong>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Precision</small>
+                      <strong class="fs-6 text-primary">{{ '%.4f' % m.classification.precision }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">Recall</small>
+                      <strong class="fs-6 text-warning">{{ '%.4f' % m.classification.recall }}</strong>
+                    </div>
+                  </div>
+                  <div class="col-3">
+                    <div class="p-2 border rounded bg-light">
+                      <small class="text-muted d-block" style="font-size:0.75rem;">F1-Score</small>
+                      <strong class="fs-6 text-purple" style="color: var(--accent-purple);">{{ '%.4f' % m.classification.f1_score }}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-between text-muted small px-1">
+                  <span>Train Acc: <strong>{{ '%.2f' % (m.classification.train_accuracy * 100) }}%</strong></span>
+                  <span>Fit: <strong>{{ '%.3f' % m.classification.train_time_sec }}s</strong></span>
+                  <span>
+                    {% if m.classification.oob_score is not none %}
+                      <span class="badge badge-oob">OOB Acc: {{ '%.4f' % m.classification.oob_score }}</span>
+                    {% else %}
+                      OOB: <span class="text-muted">&mdash;</span>
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confusion Matrix Preview for Selected Model -->
+          <div class="border rounded p-3 bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="small fw-bold text-dark">{{ m.title }} &bull; Test Set Confusion Matrix</span>
+              <span class="badge bg-secondary-subtle text-secondary small">Test Split: 24,255 Rows</span>
+            </div>
+            <div class="row justify-content-center">
+              <div class="col-md-8 col-lg-6">
+                <table class="table table-bordered table-sm text-center align-middle mb-0 bg-white">
+                  <thead>
+                    <tr class="bg-light">
+                      <th></th>
+                      <th>Predicted Normal</th>
+                      <th>Predicted High</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th class="bg-light text-start">Actual Normal</th>
+                      <td class="cm-good py-2">
+                        <strong>{{ '{:,}'.format(m.classification.confusion_matrix[0][0]) }}</strong> (TN)
+                      </td>
+                      <td class="cm-bad py-2">
+                        <strong>{{ '{:,}'.format(m.classification.confusion_matrix[0][1]) }}</strong> (FP)
+                      </td>
+                    </tr>
+                    <tr>
+                      <th class="bg-light text-start">Actual High</th>
+                      <td class="cm-bad py-2">
+                        <strong>{{ '{:,}'.format(m.classification.confusion_matrix[1][0]) }}</strong> (FN)
+                      </td>
+                      <td class="cm-good py-2">
+                        <strong>{{ '{:,}'.format(m.classification.confusion_matrix[1][1]) }}</strong> (TP)
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 2. Benchmark Summary Table: Regression -->
+<!-- ========================================================== -->
+<div class="card-custom mb-5">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table me-2 text-success"></i> 6-Model Benchmark: Continuous Energy Demand Forecasting (Regression in MW)
+    </span>
+    <span class="badge bg-success-subtle text-success border border-success-subtle">Target: AEP_MW</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Model Name</th>
+            <th>Ensemble Architecture</th>
+            <th>Test RMSE (MW) &darr;</th>
+            <th>Test MAE (MW) &darr;</th>
+            <th>Test R² Score &uarr;</th>
+            <th>Train R²</th>
+            <th>Fit Time (s)</th>
+            <th>Inference Time (s)</th>
+            <th>Out-of-Bag (OOB) R²</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in benchmark.regression_results %}
+            <tr {% if r.key == 'random_forest' %}style="background-color: #f0fdf4;"{% endif %}>
+              <td><strong>{{ r.title }}</strong></td>
+              <td>
+                {% if r.category == 'Decision Tree' %}
+                  <span class="badge badge-model-tag badge-tree">Single Tree</span>
+                {% elif r.category == 'Bagging Ensemble' %}
+                  <span class="badge badge-model-tag badge-bagging">Bagging</span>
+                {% else %}
+                  <span class="badge badge-model-tag badge-boosting">Boosting</span>
+                {% endif %}
+              </td>
+              <td><strong>{{ '%.2f' % r.test_rmse }} MW</strong></td>
+              <td>{{ '%.2f' % r.test_mae }} MW</td>
+              <td><strong>{{ '%.4f' % r.test_r2 }}</strong></td>
+              <td>{{ '%.4f' % r.train_r2 }}</td>
+              <td>{{ '%.3f' % r.train_time_sec }}s</td>
+              <td>{{ '%.4f' % r.inference_time_sec }}s</td>
+              <td>
+                {% if r.oob_score is not none %}
+                  <span class="badge badge-oob">{{ '%.4f' % r.oob_score }}</span>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 3. Benchmark Summary Table: Classification -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table me-2 text-primary"></i> 6-Model Benchmark: High-Demand Classification Suite
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Target: High_Demand (&ge; 15,310 MW)</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Model Name</th>
+            <th>Ensemble Architecture</th>
+            <th>Accuracy &uarr;</th>
+            <th>Precision &uarr;</th>
+            <th>Recall &uarr;</th>
+            <th>F1-Score &uarr;</th>
+            <th>Fit Time (s)</th>
+            <th>Inference Time (s)</th>
+            <th>OOB Accuracy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in benchmark.classification_results %}
+            <tr {% if c.key == 'random_forest' %}style="background-color: #f0fdf4;"{% endif %}>
+              <td><strong>{{ c.title }}</strong></td>
+              <td>
+                {% if c.category == 'Decision Tree' %}
+                  <span class="badge badge-model-tag badge-tree">Single Tree</span>
+                {% elif c.category == 'Bagging Ensemble' %}
+                  <span class="badge badge-model-tag badge-bagging">Bagging</span>
+                {% else %}
+                  <span class="badge badge-model-tag badge-boosting">Boosting</span>
+                {% endif %}
+              </td>
+              <td><strong>{{ '%.4f' % c.test_accuracy }}</strong></td>
+              <td>{{ '%.4f' % c.precision }}</td>
+              <td>{{ '%.4f' % c.recall }}</td>
+              <td><strong>{{ '%.4f' % c.f1_score }}</strong></td>
+              <td>{{ '%.3f' % c.train_time_sec }}s</td>
+              <td>{{ '%.4f' % c.inference_time_sec }}s</td>
+              <td>
+                {% if c.oob_score is not none %}
+                  <span class="badge badge-oob">{{ '%.4f' % c.oob_score }}</span>
+                {% else %}
+                  <span class="text-muted">&mdash;</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

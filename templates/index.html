@@ -399,7 +399,7 @@
                     <h3>4. Execution Time & Out-Of-Bag Analysis</h3>
                     <p class="text-description">
                         <strong>Execution Efficiency:</strong> LightGBM and Decision Tree exhibited the lowest training latencies (&lt; 0.15s), while Random Forest completed under 1.0s with high stability and integrated internal validation via Out-Of-Bag (OOB) estimation.<br>
-                        <strong>Out-Of-Bag (OOB) Performance:</strong> Random Forest achieved an Out-Of-Bag $R^2$ of <strong>{{ '%.4f' % benchmark.regression_results[1].oob_score if benchmark.regression_results|length > 1 and benchmark.regression_results[1].oob_score is not none else 'N/A' }}</strong> and an OOB classification accuracy of <strong>{{ '%.4f' % benchmark.classification_results[1].oob_score if benchmark.classification_results|length > 1 and benchmark.classification_results[1].oob_score is not none else 'N/A' }}</strong>, eliminating the requirement for separate cross-validation folds.
+                        <strong>Out-Of-Bag (OOB) Performance:</strong> Random Forest achieved an Out-Of-Bag R&sup2; of <strong>{{ '%.4f' % benchmark.regression_results[1].oob_score if benchmark.regression_results|length > 1 and benchmark.regression_results[1].oob_score is not none else 'N/A' }}</strong> and an OOB classification accuracy of <strong>{{ '%.4f' % benchmark.classification_results[1].oob_score if benchmark.classification_results|length > 1 and benchmark.classification_results[1].oob_score is not none else 'N/A' }}</strong>, eliminating the requirement for separate cross-validation folds.
                     </p>
                 </div>
             {% endif %}

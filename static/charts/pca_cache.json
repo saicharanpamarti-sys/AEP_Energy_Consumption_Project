@@ -1,0 +1,50 @@
+{
+  "dataset_rows": 121273,
+  "pc1_variance": 43.79,
+  "pc2_variance": 20.65,
+  "cumulative_variance_2pc": 64.44,
+  "features": [
+    "hour",
+    "month",
+    "dayofweek",
+    "lag_1",
+    "lag_24"
+  ],
+  "loadings": [
+    {
+      "feature": "hour",
+      "pc1": 0.437,
+      "pc2": 0.1927,
+      "pc3": 0.2834
+    },
+    {
+      "feature": "month",
+      "pc1": -0.1327,
+      "pc2": -0.0226,
+      "pc3": 0.9584
+    },
+    {
+      "feature": "dayofweek",
+      "pc1": -0.0971,
+      "pc2": 0.9628,
+      "pc3": -0.0331
+    },
+    {
+      "feature": "lag_1",
+      "pc1": 0.6303,
+      "pc2": -0.1269,
+      "pc3": 0.0042
+    },
+    {
+      "feature": "lag_24",
+      "pc1": 0.6203,
+      "pc2": 0.139,
+      "pc3": -0.0041
+    }
+  ],
+  "charts": {
+    "scree": "charts/pca_scree_variance.png",
+    "projection": "charts/pca_2d_projection.png"
+  },
+  "timestamp": "2026-10-16 10:36:17"
+}

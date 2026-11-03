@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEP Energy Consumption - Model Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+    <h1>AEP Energy Consumption Project</h1>
+    <div class="topbar-actions">
+        <span class="cache-badge" title="Timestamp of latest model benchmark">
+            Cached: {{ explorer.cached_at }}
+        </span>
+        <button id="retrain-btn" class="retrain-button" onclick="triggerRetrain()">
+            <span id="retrain-spinner" class="spinner-inline" style="display:none;">⏳</span>
+            Retrain Models
+        </button>
+    </div>
+</header>
+
+<div class="layout">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <ul>
+            <li>
+                <a href="{{ url_for('data_loading') }}" class="menu-item {% if active == 'data-loading' %}active{% endif %}">
+                    Data Loading
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('preprocessing') }}" class="menu-item {% if active == 'preprocessing' %}active{% endif %}">
+                    Preprocessing
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('eda') }}" class="menu-item {% if active == 'eda' %}active{% endif %}">
+                    EDA Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('model_explorer') }}" class="menu-item {% if active == 'models' %}active{% endif %}">
+                    ★ Model Explorer
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('linear_regression') }}" class="menu-item {% if active == 'linear-regression' %}active{% endif %}">
+                    Linear Regression
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logistic_regression') }}" class="menu-item {% if active == 'logistic-regression' %}active{% endif %}">
+                    Logistic Regression
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('decision_tree') }}" class="menu-item {% if active == 'decision-tree' %}active{% endif %}">
+                    Decision Tree Legacy
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content">
+        <div class="page-header">
+            <div>
+                <h2>Interactive Model Explorer</h2>
+                <p class="subtitle">
+                    Benchmarking 6 tree & boosting algorithms on <strong>{{ "{:,}".format(explorer.dataset_rows) }}</strong> hourly observations 
+                    with autoregressive lags and rolling 24-hour demand statistics.
+                </p>
+            </div>
+        </div>
+
+        {% if error %}
+            <div class="error-banner">{{ error }}</div>
+        {% endif %}
+
+        <!-- Model Navigation Pills (6 Tabs) -->
+        <nav class="model-pills-nav" aria-label="Model Selection">
+            {% for m in explorer.models %}
+                <button type="button" 
+                        class="model-pill-btn {% if loop.first %}active{% endif %}" 
+                        data-target="model-card-{{ m.slug }}"
+                        id="tab-btn-{{ m.slug }}"
+                        onclick="switchModelTab('{{ m.slug }}')">
+                    <span class="pill-dot" style="background-color: {{ m.accent_color }};"></span>
+                    <span class="pill-title">{{ m.title }}</span>
+                    <span class="pill-r2">R² {{ "%.4f"|format(m.metrics.test_r2) }}</span>
+                </button>
+            {% endfor %}
+        </nav>
+
+        <!-- Dynamic Model Cards Container -->
+        <div class="model-cards-container">
+            {% for m in explorer.models %}
+                <section class="model-card {% if loop.first %}active{% endif %}" 
+                         id="model-card-{{ m.slug }}" 
+                         data-slug="{{ m.slug }}"
+                         aria-labelledby="heading-{{ m.slug }}">
+                    
+                    <!-- Header & Highlight Banner -->
+                    <div class="model-card-header">
+                        <div class="model-title-wrap">
+                            <h3 id="heading-{{ m.slug }}" class="model-title">{{ m.title }}</h3>
+                            <span class="model-class-tag">{{ m.class_name }}</span>
+                        </div>
+                        <div class="standout-metric-badge" style="border-color: {{ m.accent_color }}; color: {{ m.accent_color }};">
+                            <span class="star-icon">★</span> {{ m.standout_metric }}
+                        </div>
+                    </div>
+
+                    <!-- Key Strength Callout Banner -->
+                    <div class="key-strength-banner" style="border-left-color: {{ m.accent_color }};">
+                        <div class="banner-icon">💡</div>
+                        <div class="banner-body">
+                            <strong class="banner-label">Key Strength:</strong>
+                            <p class="banner-text">{{ m.key_strength }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Small Text Feature Badges Section -->
+                    <div class="feature-badges-section">
+                        <div class="feature-section-header">
+                            <span class="feature-section-title">Features Fed to Model ({{ explorer.feature_count }} Features)</span>
+                            <span class="feature-target-note">Target: <code>{{ explorer.target_variable }}</code></span>
+                        </div>
+                        <div class="feature-pills-cluster">
+                            <!-- Temporal features -->
+                            {% for f in explorer.temporal_features %}
+                                <span class="badge badge-temporal" title="Temporal Feature">{{ f }}</span>
+                            {% endfor %}
+                            <!-- Autoregressive lags -->
+                            {% for f in explorer.lag_features %}
+                                <span class="badge badge-lag" title="Autoregressive Lag">{{ f }}</span>
+                            {% endfor %}
+                            <!-- Rolling statistics -->
+                            {% for f in explorer.rolling_features %}
+                                <span class="badge badge-rolling" title="Rolling Window Statistic">{{ f }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="feature-strategy-note">
+                            <em><strong>Feature Selection Strategy:</strong> {{ m.feature_selection_strategy }}</em>
+                        </div>
+                    </div>
+
+                    <!-- Performance Metrics Grid -->
+                    <div class="metrics-dashboard">
+                        <div class="metric-box highlight">
+                            <span class="metric-box-label">Test R² Score</span>
+                            <span class="metric-box-val">{{ "%.4f"|format(m.metrics.test_r2) }}</span>
+                            <span class="metric-box-sub">Train R²: {{ "%.4f"|format(m.metrics.train_r2) }}</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-box-label">Test RMSE</span>
+                            <span class="metric-box-val">{{ "%.2f"|format(m.metrics.test_rmse) }} <small>MW</small></span>
+                            <span class="metric-box-sub">Train RMSE: {{ "%.2f"|format(m.metrics.train_rmse) }} MW</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-box-label">Test MAE</span>
+                            <span class="metric-box-val">{{ "%.2f"|format(m.metrics.test_mae) }} <small>MW</small></span>
+                            <span class="metric-box-sub">Train MAE: {{ "%.2f"|format(m.metrics.train_mae) }} MW</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-box-label">Peak Demand Acc.</span>
+                            <span class="metric-box-val">{{ "%.2f"|format(m.metrics.test_accuracy) }}%</span>
+                            <span class="metric-box-sub">Train Acc: {{ "%.2f"|format(m.metrics.train_accuracy) }}%</span>
+                        </div>
+
+                        <div class="metric-box">
+                            <span class="metric-box-label">Training Time</span>
+                            <span class="metric-box-val">{{ "%.2f"|format(m.metrics.training_time_sec) }} <small>s</small></span>
+                            <span class="metric-box-sub">96,880 train rows</span>
+                        </div>
+
+                        {% if m.metrics.oob_score is defined %}
+                        <div class="metric-box accent-box">
+                            <span class="metric-box-label">Out-Of-Bag (OOB)</span>
+                            <span class="metric-box-val">{{ "%.4f"|format(m.metrics.oob_score) }}</span>
+                            <span class="metric-box-sub">oob_score=True</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recent Forecast Sample Preview Table -->
+                    {% if m.sample_preview %}
+                    <div class="sample-preview-block">
+                        <h4>Recent Test Set Forecast Inspection (Sample Hours)</h4>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Actual Load (MW)</th>
+                                        <th>Predicted Load (MW)</th>
+                                        <th>Absolute Error (MW)</th>
+                                        <th>Relative Error (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for s in m.sample_preview %}
+                                    <tr>
+                                        <td><code>{{ s.datetime }}</code></td>
+                                        <td><strong>{{ "{:,.1f}".format(s.actual_mw) }}</strong></td>
+                                        <td>{{ "{:,.1f}".format(s.predicted_mw) }}</td>
+                                        <td>{{ "{:,.1f}".format(s.abs_error) }}</td>
+                                        <td>
+                                            <span class="error-badge {% if s.pct_error < 2.0 %}good{% else %}fair{% endif %}">
+                                                {{ s.pct_error }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </section>
+            {% endfor %}
+        </div>
+
+        <!-- Global Comparison Table (Expandable Summary) -->
+        <div class="section-group leaderboard-card">
+            <div class="leaderboard-header">
+                <div>
+                    <h3>Global Model Benchmark & Leaderboard</h3>
+                    <p class="leaderboard-sub">Comparative evaluation across all 6 models ranked by Test R² and RMSE on {{ "{:,}".format(explorer.test_rows) }} test hours.</p>
+                </div>
+                <button type="button" class="toggle-btn" onclick="toggleLeaderboard()" id="leaderboard-toggle-btn">
+                    Collapse Table ▾
+                </button>
+            </div>
+
+            <div id="leaderboard-table-wrap" class="table-wrapper">
+                <table class="data-table comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Model</th>
+                            <th>Test R²</th>
+                            <th>Test RMSE</th>
+                            <th>Test MAE</th>
+                            <th>Peak Acc.</th>
+                            <th>Train Time</th>
+                            <th>Standout Metric</th>
+                            <th>Inspect</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rm in explorer.ranked_models %}
+                        <tr class="leaderboard-row" onclick="switchModelTab('{{ rm.slug }}')">
+                            <td>
+                                <span class="rank-badge rank-{{ rm.rank }}">#{{ rm.rank }}</span>
+                            </td>
+                            <td>
+                                <strong style="color: {{ rm.accent_color }};">{{ rm.title }}</strong>
+                                <div class="sub-class">{{ rm.class_name.split('/')[0].strip() }}</div>
+                            </td>
+                            <td><strong>{{ "%.4f"|format(rm.metrics.test_r2) }}</strong></td>
+                            <td>{{ "%.2f"|format(rm.metrics.test_rmse) }} MW</td>
+                            <td>{{ "%.2f"|format(rm.metrics.test_mae) }} MW</td>
+                            <td>{{ "%.2f"|format(rm.metrics.test_accuracy) }}%</td>
+                            <td>{{ "%.2f"|format(rm.metrics.training_time_sec) }}s</td>
+                            <td>
+                                <span class="metric-pill">{{ rm.standout_metric }}</span>
+                            </td>
+                            <td>
+                                <button type="button" class="inspect-btn" onclick="event.stopPropagation(); switchModelTab('{{ rm.slug }}')">
+                                    View Card →
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    // Tab switching function without page reload
+    function switchModelTab(slug) {
+        // Deactivate all tab buttons
+        document.querySelectorAll('.model-pill-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        // Deactivate all cards
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.classList.remove('active');
+        });
+
+        // Activate matching button
+        const activeBtn = document.getElementById('tab-btn-' + slug);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        // Activate matching card
+        const activeCard = document.getElementById('model-card-' + slug);
+        if (activeCard) {
+            activeCard.classList.add('active');
+            activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Update URL hash without jumping
+        if (history.pushState) {
+            history.pushState(null, null, '#' + slug);
+        } else {
+            location.hash = slug;
+        }
+    }
+
+    // Toggle leaderboard visibility
+    function toggleLeaderboard() {
+        const wrap = document.getElementById('leaderboard-table-wrap');
+        const btn = document.getElementById('leaderboard-toggle-btn');
+        if (wrap.style.display === 'none') {
+            wrap.style.display = 'block';
+            btn.textContent = 'Collapse Table ▾';
+        } else {
+            wrap.style.display = 'none';
+            btn.textContent = 'Expand Table ▸';
+        }
+    }
+
+    // Retrain trigger
+    function triggerRetrain() {
+        if (!confirm('Retrain all 6 models from scratch on the full historical dataset? This may take ~20-30 seconds.')) {
+            return;
+        }
+        const btn = document.getElementById('retrain-btn');
+        const spinner = document.getElementById('retrain-spinner');
+        btn.disabled = true;
+        spinner.style.display = 'inline';
+        btn.childNodes[2].textContent = ' Training 6 Models...';
+
+        window.location.href = "{{ url_for('model_explorer') }}?retrain=1";
+    }
+
+    // Handle deep links via URL hash on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            const targetCard = document.getElementById('model-card-' + hash);
+            if (targetCard) {
+                switchModelTab(hash);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

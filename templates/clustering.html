@@ -1,0 +1,370 @@
+{% extends "base.html" %}
+
+{% block title %}Unsupervised Clustering Suite - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Unsupervised Learning &bull; Visual Operational Tools</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Comprehensive Unsupervised Clustering Suite</h2>
+    <p class="text-muted mb-0">Interactive operational clustering tool evaluating K-Means, Hierarchical agglomeration, DBSCAN outlier isolation, and GMM probabilistic regimes.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('pca_route') }}" class="btn btn-emerald">
+      Proceed to PCA Dimensionality Reduction &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 1. Real-World Applications Header Card -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4 border-primary shadow-sm">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-grid-1x2-fill text-primary me-2"></i> Real-World Industrial & Scientific Applications of Clustering
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Unsupervised Taxonomy</span>
+  </div>
+  <div class="card-custom-body">
+    <p class="small text-muted mb-3">
+      In smart grid infrastructure, clustering extracts latent operational patterns, seasonal dispatch archetypes, and extreme grid risks directly from continuous time-series trajectories:
+    </p>
+    <div class="row g-3">
+      {% for app in summary.application_badges %}
+        <div class="col-md-6 col-lg-3">
+          <div class="border rounded p-3 h-100 bg-light">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-{{ app.color }} p-2 fs-6">
+                <i class="bi {{ app.icon }}"></i>
+              </span>
+              <h6 class="fw-bold mb-0 text-dark">{{ app.title }}</h6>
+            </div>
+            <p class="small text-muted mb-0">{{ app.description }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 2. Partition-Based Clustering: K-Means Interactive View -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-pie-chart-fill text-primary me-2"></i> 1. Partition-Based: K-Means Interactive Suite
+    </span>
+    <span class="badge bg-light text-dark border">Operational Regimes</span>
+  </div>
+  <div class="card-custom-body">
+    <p class="small text-muted mb-3">
+      K-Means groups the 121,273 hourly consumption records into distinct daily dispatch regimes. Grid dispatchers determine the optimal number of operational states using the interactive diagnostic switcher below:
+    </p>
+
+    <!-- Interactive View Switcher Tabs -->
+    <ul class="nav nav-pills mb-3" id="kmeansPills" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active btn-sm" id="pills-elbow-tab" data-bs-toggle="pill" data-bs-target="#pills-elbow" type="button" role="tab">
+          <i class="bi bi-graph-down me-1"></i> The Elbow Method (Default)
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-sm" id="pills-silhouette-tab" data-bs-toggle="pill" data-bs-target="#pills-silhouette" type="button" role="tab">
+          <i class="bi bi-bar-chart-line me-1"></i> Silhouette Score Analysis
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link btn-sm" id="pills-explorer-tab" data-bs-toggle="pill" data-bs-target="#pills-explorer" type="button" role="tab">
+          <i class="bi bi-sliders me-1"></i> Interactive K Explorer
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="kmeansPillsContent">
+      <!-- 1. The Elbow Method -->
+      <div class="tab-pane fade show active" id="pills-elbow" role="tabpanel">
+        <div class="border rounded p-3 bg-white text-center">
+          <img src="{{ url_for('static', filename='charts/kmeans_elbow_curve.png') }}" class="img-fluid rounded border mb-2" alt="K-Means Elbow Method">
+          <p class="small text-muted mb-0 text-start">
+            <strong class="text-dark">Sharp Inflection Point at K=3:</strong> Inertia (Sum of Squared Errors) drops precipitously from K=2 to K=3 (a reduction of over 290,000 within-cluster variance units) and flattens out into a shallow slope for K &gt; 3. This proves that 3 operational clusters represent the true physical regime boundary for the AEP grid without over-partitioning.
+          </p>
+        </div>
+      </div>
+
+      <!-- 2. Silhouette Score Analysis -->
+      <div class="tab-pane fade" id="pills-silhouette" role="tabpanel">
+        <div class="border rounded p-3 bg-white text-center">
+          <img src="{{ url_for('static', filename='charts/kmeans_silhouette_curve.png') }}" class="img-fluid rounded border mb-2" alt="K-Means Silhouette Curve">
+          <p class="small text-muted mb-0 text-start">
+            <strong class="text-dark">True Global Peak at K=3 (Score = 0.432):</strong> The mean silhouette coefficient reaches its absolute maximum at K=3, steadily decreasing as K expands toward 10. This confirms maximum cluster cohesion and inter-cluster separation, proving that higher K values merely split homogeneous seasonal profiles into artificial sub-clusters.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3. Interactive K Explorer -->
+      <div class="tab-pane fade" id="pills-explorer" role="tabpanel">
+        <div class="border rounded p-3 bg-light mb-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+              <label for="kSelect" class="form-label fw-bold small">Select Number of Clusters (K):</label>
+              <div class="d-flex align-items-center gap-3">
+                <input type="range" class="form-range" min="2" max="8" step="1" id="kRange" value="3" oninput="document.getElementById('kInput').value = this.value">
+                <input type="number" class="form-control text-center fw-bold" id="kInput" value="3" min="2" max="8" style="width: 70px;" oninput="document.getElementById('kRange').value = this.value">
+              </div>
+              <small class="text-muted">Explore diurnal load curve splits between 2 and 8 regimes.</small>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-primary btn-sm px-3 mt-md-3" id="runKMeansBtn" onclick="runInteractiveKMeans()">
+                <i class="bi bi-play-circle-fill me-1"></i> Run Clustering & Update Diurnal Curves
+              </button>
+            </div>
+            <div class="col-md-3 text-md-end">
+              <span class="badge bg-success-subtle text-success border border-success-subtle p-2" id="kStatusBadge">
+                Optimal Baseline: K = 3
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded p-3 bg-white text-center">
+          <div id="kmeansSpinner" class="spinner-border text-primary my-4 d-none" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <img id="diurnalImg" src="{{ url_for('static', filename='charts/kmeans_diurnal_profiles_k3.png') }}" class="img-fluid rounded border mb-2" alt="24-Hour Diurnal Load Profiles">
+          <p class="small text-muted mb-0 text-start" id="diurnalCaption">
+            <strong class="text-dark">Operational Archetypes (K=3):</strong> Shows the 24-hour diurnal curves for (1) Winter Heating peakers with dual morning/evening humps, (2) Summer Cooling plateaus with heavy afternoon air conditioning, and (3) Mild Shoulder baseline curves.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 3. Hierarchical Agglomerative Clustering -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-diagram-2 text-danger me-2"></i> 2. Hierarchical Agglomerative Clustering
+    </span>
+    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Multi-Scale Topology</span>
+  </div>
+  <div class="card-custom-body">
+    <div class="row g-4 mb-3">
+      <!-- Dendrogram Chart with Cut Line -->
+      <div class="col-lg-7">
+        <div class="border rounded p-3 bg-white h-100 text-center">
+          <h6 class="fw-bold text-dark mb-2">Hierarchical Cophenetic Dendrogram (Threshold Cut at K=3)</h6>
+          <img src="{{ url_for('static', filename='charts/hierarchical_dendrogram.png') }}" class="img-fluid rounded border mb-2" alt="Hierarchical Dendrogram">
+          <p class="small text-muted mb-0 text-start">
+            <strong class="text-dark">Threshold Cut at Height H=17.5:</strong> The red dashed cut line slices the Ward linkage hierarchy across daily load profiles into exactly 3 major branches, corresponding to high-demand winter freezes, summer cooling surges, and temperate shoulder days.
+          </p>
+        </div>
+      </div>
+
+      <!-- Linkage Methods Selector & Operational Impact -->
+      <div class="col-lg-5">
+        <div class="border rounded p-3 bg-light h-100">
+          <h6 class="fw-bold text-dark mb-2">Linkage Criteria & Impact on Daily Grid Profiles</h6>
+          <p class="small text-muted mb-3">How pairwise distance metrics dictate seasonal profile clustering:</p>
+
+          <div class="list-group list-group-flush border rounded bg-white">
+            {% for link in summary.hierarchical.linkages %}
+              <div class="list-group-item p-2">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <strong class="text-dark small">{{ link.name }}</strong>
+                  {% if 'Default' in link.name %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">Recommended</span>
+                  {% endif %}
+                </div>
+                <div class="small text-muted mb-1">{{ link.behavior }}</div>
+                <div class="small fw-semibold text-primary"><i class="bi bi-arrow-right-short"></i> {{ link.grid_impact }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 4. Density-Based Clustering: DBSCAN Outlier Detection -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-shield-exclamation text-warning me-2"></i> 3. Density-Based: DBSCAN Anomaly & Outlier Isolation
+    </span>
+    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Extreme Weather Outliers</span>
+  </div>
+  <div class="card-custom-body">
+    <p class="small text-muted mb-3">
+      DBSCAN identifies continuous high-density baseline load regimes while isolating extreme weather anomalies as unclustered noise (Cluster ID: -1).
+    </p>
+
+    <!-- Interactive Parameter Sliders & KPI Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-light h-100">
+          <h6 class="fw-bold text-dark mb-3">Interactive Parameter Tuning:</h6>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <label for="epsSlider" class="form-label small fw-bold mb-1">Neighborhood Radius (&epsilon;):</label>
+              <span class="badge bg-primary" id="epsVal">0.85</span>
+            </div>
+            <input type="range" class="form-range" id="epsSlider" min="0.4" max="1.5" step="0.05" value="0.85" oninput="updateDBSCAN()">
+          </div>
+
+          <div class="mb-2">
+            <div class="d-flex justify-content-between">
+              <label for="minSamplesSlider" class="form-label small fw-bold mb-1">Minimum Core Points (min_samples):</label>
+              <span class="badge bg-primary" id="minSamplesVal">15</span>
+            </div>
+            <input type="range" class="form-range" id="minSamplesSlider" min="5" max="30" step="1" value="15" oninput="updateDBSCAN()">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="row g-2 h-100">
+          <div class="col-6">
+            <div class="border rounded p-3 bg-white text-center h-100 d-flex flex-column justify-content-center">
+              <small class="text-muted fw-bold text-uppercase">Detected Clusters</small>
+              <div class="fs-3 fw-bold text-primary" id="dbscanClusters">2 Regimes</div>
+              <small class="text-muted">Dense baseline operational states</small>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="border rounded p-3 bg-white text-center h-100 d-flex flex-column justify-content-center">
+              <small class="text-muted fw-bold text-uppercase">Isolated Noise Points</small>
+              <div class="fs-3 fw-bold text-danger" id="dbscanNoise">384 Outliers</div>
+              <small class="text-danger fw-semibold" id="dbscanNoisePct">3.2% of points</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anomaly Plot Embedding -->
+    <div class="border rounded p-3 bg-white text-center">
+      <img src="{{ url_for('static', filename='charts/dbscan_anomaly_plot.png') }}" class="img-fluid rounded border mb-2" alt="DBSCAN Anomaly Scatter Plot">
+      <div class="p-2 rounded bg-light border text-start small text-muted">
+        <strong class="text-dark"><i class="bi bi-info-circle-fill text-danger me-1"></i> Isolating Polar Vortex & Extreme Surges:</strong>
+        Observations marked as red points represent unclustered density noise (<code>label = -1</code>). Notice the severe load spikes exceeding 24,000 MW during the historic February 2015 North American Polar Vortex and mid-summer heatwaves. DBSCAN automatically flags these grid emergencies without requiring labeled fault supervisory datasets.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 5. Model-Based Clustering: Gaussian Mixture Models (GMM) -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-bell-fill text-purple me-2" style="color: var(--accent-purple);"></i> 4. Model-Based: Gaussian Mixture Models (GMM)
+    </span>
+    <span class="badge bg-purple-subtle text-purple border" style="background-color: #f3e8ff; color: #7c3aed; border-color: #e9d5ff;">Soft Transitions</span>
+  </div>
+  <div class="card-custom-body">
+    <p class="small text-muted mb-3">
+      Unlike hard clustering methods that force binary cluster assignments, Gaussian Mixture Models represent the continuous energy demand curve as a soft probabilistic mixture of Gaussian components, capturing gradual weather transitions between seasons.
+    </p>
+
+    <div class="row g-4">
+      <!-- Chart 1: BIC/AIC Curve -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 text-center">
+          <h6 class="fw-bold text-dark mb-2">BIC & AIC Model Selection Curve (K=1 to 8)</h6>
+          <img src="{{ url_for('static', filename='charts/gmm_bic_aic_curve.png') }}" class="img-fluid rounded border mb-2" alt="GMM BIC/AIC Selection Curve">
+          <p class="small text-muted mb-0 text-start">
+            <strong class="text-dark">Parsimony Minimum:</strong> The Bayesian Information Criterion (BIC) penalizes model complexity and reaches its global minimum at <strong>K = 3 components</strong>, confirming that adding a 4th component overparameterizes the seasonal load distribution.
+          </p>
+        </div>
+      </div>
+
+      <!-- Chart 2: Soft Assignment Transition -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 text-center">
+          <h6 class="fw-bold text-dark mb-2">Soft Component Probabilities Across Calendar Months</h6>
+          <img src="{{ url_for('static', filename='charts/gmm_soft_assignment.png') }}" class="img-fluid rounded border mb-2" alt="GMM Soft Probability Assignment">
+          <p class="small text-muted mb-0 text-start">
+            <strong class="text-dark">Seasonal Transition Dynamics:</strong> Demonstrates continuous probabilistic shifts: Winter heating dominates Dec-Feb (P &gt; 0.8), transitioning smoothly through mild shoulder conditions in April-May (P &gt; 0.7), and peaking into summer cooling in July-August (P &gt; 0.85).
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('pca_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to PCA Dimensionality Reduction &rarr;
+  </a>
+</div>
+
+<!-- Client-side Interactive Scripts -->
+<script>
+function runInteractiveKMeans() {
+  const k = document.getElementById('kInput').value;
+  const spinner = document.getElementById('kmeansSpinner');
+  const img = document.getElementById('diurnalImg');
+  const badge = document.getElementById('kStatusBadge');
+  const caption = document.getElementById('diurnalCaption');
+
+  spinner.classList.remove('d-none');
+  img.style.opacity = '0.4';
+
+  fetch(`/api/clustering/kmeans?k=${k}`)
+    .then(res => res.json())
+    .then(data => {
+      spinner.classList.add('d-none');
+      img.style.opacity = '1';
+      if (data.status === 'success') {
+        img.src = `${data.chart_url}?t=${new Date().getTime()}`;
+        badge.textContent = `Active Explorer: K = ${data.k}`;
+        badge.className = data.k == 3 
+          ? 'badge bg-success-subtle text-success border border-success-subtle p-2' 
+          : 'badge bg-primary-subtle text-primary border border-primary-subtle p-2';
+        caption.innerHTML = `<strong class="text-dark">Operational Archetypes (K=${data.k}):</strong> Diurnal 24-hour load curves generated dynamically across ${data.k} operational dispatch states for American Electric Power.`;
+      }
+    })
+    .catch(err => {
+      spinner.classList.add('d-none');
+      img.style.opacity = '1';
+      console.error(err);
+    });
+}
+
+let dbscanTimeout = null;
+function updateDBSCAN() {
+  const eps = document.getElementById('epsSlider').value;
+  const minSamples = document.getElementById('minSamplesSlider').value;
+  document.getElementById('epsVal').textContent = eps;
+  document.getElementById('minSamplesVal').textContent = minSamples;
+
+  clearTimeout(dbscanTimeout);
+  dbscanTimeout = setTimeout(() => {
+    fetch(`/api/clustering/dbscan?eps=${eps}&min_samples=${minSamples}`)
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.status === 'success') {
+          const d = resp.data;
+          document.getElementById('dbscanClusters').textContent = `${d.n_clusters} Regimes`;
+          document.getElementById('dbscanNoise').textContent = `${d.noise_count.toLocaleString()} Outliers`;
+          document.getElementById('dbscanNoisePct').textContent = `${d.noise_pct}% of points (${d.polar_vortex_outliers_detected} severe freeze surges)`;
+        }
+      })
+      .catch(err => console.error(err));
+  }, 300);
+}
+</script>
+{% endblock %}

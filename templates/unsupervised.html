@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Unsupervised Learning - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Section 2 &bull; Unsupervised Learning Suite</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Clustering & Dimensionality Reduction Architecture</h2>
+    <p class="text-muted mb-0">Unsupervised pattern discovery, anomaly detection via DBSCAN, profile clustering via K-Means, and PCA manifold projection.</p>
+  </div>
+  <div>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+      <i class="bi bi-diagram-2 me-1"></i> Course Syllabus Pipeline
+    </span>
+  </div>
+</div>
+
+<!-- Architecture Tabs -->
+<ul class="nav nav-tabs nav-tabs-custom mb-4" id="unsupervisedTabs" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if active_tab == 'clustering' %}active{% endif %}" 
+            id="clustering-tab" 
+            data-bs-toggle="tab" 
+            data-bs-target="#clustering-pane" 
+            type="button" 
+            role="tab">
+      <i class="bi bi-bullseye me-1 text-danger"></i> Clustering (DBSCAN & K-Means)
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if active_tab == 'pca' %}active{% endif %}" 
+            id="pca-tab" 
+            data-bs-toggle="tab" 
+            data-bs-target="#pca-pane" 
+            type="button" 
+            role="tab">
+      <i class="bi bi-bounding-box-circles me-1 text-info"></i> PCA Dimensionality Reduction
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content" id="unsupervisedTabsContent">
+
+  <!-- ==================== CLUSTERING PANE ==================== -->
+  <div class="tab-pane fade {% if active_tab == 'clustering' %}show active{% endif %}" id="clustering-pane" role="tabpanel">
+    
+    <!-- DBSCAN Section -->
+    <div class="card-custom mb-4">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-shield-exclamation text-danger me-2"></i> 1. DBSCAN Density-Based Outlier & Anomaly Clustering
+        </span>
+        <span class="badge bg-secondary">Pipeline: DBSCAN.py</span>
+      </div>
+      <div class="card-custom-body">
+        <p class="text-muted small">
+          Density-Based Spatial Clustering of Applications with Noise (DBSCAN) discovers arbitrary-shaped clusters without pre-specifying <em>k</em>, isolating anomalous extreme demand spikes as noise.
+        </p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="border rounded p-3 bg-light text-center">
+              <div class="text-muted small fw-bold text-uppercase">Core Density Samples</div>
+              <div class="fs-4 fw-bold text-success">Regular Grid Regimes</div>
+              <small class="text-muted">Standard diurnal baselines within &epsilon;-neighborhood</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 bg-light text-center">
+              <div class="text-muted small fw-bold text-uppercase">Border Samples</div>
+              <div class="fs-4 fw-bold text-primary">Transition Transitions</div>
+              <small class="text-muted">Shoulder hours and weather shifts on cluster perimeters</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 bg-light text-center">
+              <div class="text-muted small fw-bold text-uppercase">Noise Anomalies (label = -1)</div>
+              <div class="fs-4 fw-bold text-danger">Severe Outliers</div>
+              <small class="text-muted">Polar vortex freezes and historic heatwave emergencies</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-custom mb-0">
+            <thead>
+              <tr>
+                <th>Hyperparameter</th>
+                <th>Syllabus Value</th>
+                <th>Engineering Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>eps (&epsilon;)</code></td>
+                <td><span class="badge bg-light text-dark border">6.0 (Scaled)</span></td>
+                <td>Maximum radius distance of neighborhood around a sample.</td>
+              </tr>
+              <tr>
+                <td><code>min_samples</code></td>
+                <td><span class="badge bg-light text-dark border">5</span></td>
+                <td>Minimum observations required in &epsilon;-neighborhood to establish a core point.</td>
+              </tr>
+              <tr>
+                <td><code>Distance Metric</code></td>
+                <td><span class="badge bg-light text-dark border">Euclidean</span></td>
+                <td>Calculated over multidimensional diurnal and temporal lag feature spaces.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- K-Means Profile Clustering -->
+    <div class="card-custom mb-4">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-pie-chart-fill text-warning me-2"></i> 2. K-Means 24-Hour Load Profile Archetype Clustering
+        </span>
+        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Cluster Archetypes</span>
+      </div>
+      <div class="card-custom-body">
+        <p class="text-muted small">
+          Groups the 365 daily 24-hour demand curves into <em>k</em> = 3 distinct behavioral operational profiles:
+        </p>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100 bg-white">
+              <h6 class="fw-bold text-primary"><i class="bi bi-snow me-1"></i> Cluster 1: Winter Peakers</h6>
+              <p class="small text-muted mb-0">Dual-peaked curves with elevated morning (8 AM) and evening (7 PM) space heating loads during November through March.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100 bg-white">
+              <h6 class="fw-bold text-danger"><i class="bi bi-sun-fill me-1"></i> Cluster 2: Summer Cooling Peakers</h6>
+              <p class="small text-muted mb-0">Sustained broad afternoon plateaus peaking between 2 PM and 6 PM driven by commercial air conditioning during June through August.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 h-100 bg-white">
+              <h6 class="fw-bold text-success"><i class="bi bi-flower1 me-1"></i> Cluster 3: Mild Shoulder Seasons</h6>
+              <p class="small text-muted mb-0">Lowest overall consumption levels during temperate spring (April-May) and autumn (October) months without heating/cooling stress.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== PCA PANE ==================== -->
+  <div class="tab-pane fade {% if active_tab == 'pca' %}show active{% endif %}" id="pca-pane" role="tabpanel">
+    
+    <div class="card-custom mb-4">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-bounding-box-circles text-info me-2"></i> Principal Component Analysis (PCA) Dimensionality Reduction
+        </span>
+        <span class="badge bg-info-subtle text-info border border-info-subtle">Orthogonal Decomposition</span>
+      </div>
+      <div class="card-custom-body">
+        <p class="text-muted small">
+          Projects high-dimensional multi-lag temporal features (<em>d</em> = 24) into an orthogonal 2D/3D subspace maximizing variance:
+        </p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="metric-box">
+              <div class="metric-box-title">PC 1 (Explained Variance)</div>
+              <div class="metric-box-value text-primary">~72.4%</div>
+              <div class="metric-box-sub">Captures general daily load magnitude (Total Energy Volume)</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="metric-box">
+              <div class="metric-box-title">PC 2 (Explained Variance)</div>
+              <div class="metric-box-value text-success">~18.1%</div>
+              <div class="metric-box-sub">Captures diurnal contrast (Daytime Peak vs. Overnight Base)</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="metric-box">
+              <div class="metric-box-title">Cumulative Variance (2 PCs)</div>
+              <div class="metric-box-value text-purple" style="color: var(--accent-purple);">~90.5%</div>
+              <div class="metric-box-sub">Retains over 90% of structural variance in just 2 dimensions</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="border rounded p-3 bg-light">
+          <h6 class="fw-bold text-dark mb-2">Mathematical Formulation</h6>
+          <p class="small text-muted mb-2">
+            Given sample covariance matrix &Sigma; = (1/n) X<sup>T</sup> X, PCA computes orthogonal spectral eigenvectors <em>v</em><sub>i</sub>:
+          </p>
+          <div class="bg-white p-2 rounded border font-monospace text-center small mb-3">
+            &Sigma; v<sub>i</sub> = &lambda;<sub>i</sub> v<sub>i</sub>, &nbsp; where &lambda;<sub>1</sub> &ge; &lambda;<sub>2</sub> &ge; &hellip; &ge; &lambda;<sub>d</sub>
+          </div>
+          <p class="small text-muted mb-0">
+            Enables 2D interactive projection of the 121,273 records, accelerating training of downstream classifiers while mitigating multicollinearity between adjacent hourly lags.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Logistic Regression - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning Pipeline &bull; Step 5</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Logistic Regression Classification Suite</h2>
+    <p class="text-muted mb-0">Dual-model architecture benchmarking static calendar features against autoregressive historical demand lags on High-Demand binary classification (1 &ge; 15,310 MW).</p>
+  </div>
+  <div>
+    <a href="{{ url_for('decision_tree_route') }}" class="btn btn-emerald">
+      Proceed to Decision Tree &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Side-by-Side Evaluation Dashboard -->
+<div class="row g-4 mb-4">
+  <!-- Model A: Calendar Baseline -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100 border-start border-4 border-danger shadow-sm">
+      <div class="card-custom-header d-flex justify-content-between align-items-center">
+        <div>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle me-2">Model A</span>
+          <span class="fw-bold fs-6">Calendar Baseline Classifier</span>
+        </div>
+        <span class="badge bg-light text-muted border">High Bias (~71% Acc)</span>
+      </div>
+      <div class="card-custom-body">
+        <div class="mb-3">
+          <small class="text-muted fw-bold d-block mb-1">Features Used:</small>
+          <div class="d-flex flex-wrap gap-1">
+            {% for f in model_a.features %}
+              <span class="badge bg-secondary-subtle text-secondary border">{{ f }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row g-2 text-center mb-3">
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test Acc</small>
+              <strong class="fs-6 text-danger">{{ '%.2f' % (model_a.test_accuracy * 100) }}%</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Precision</small>
+              <strong class="fs-6">{{ '%.4f' % model_a.precision }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Recall</small>
+              <strong class="fs-6">{{ '%.4f' % model_a.recall }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">F1-Score</small>
+              <strong class="fs-6">{{ '%.4f' % model_a.f1_score }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">ROC-AUC</small>
+              <strong class="fs-6 text-danger">{{ '%.4f' % model_a.roc_auc }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="p-2 rounded bg-light small text-muted border">
+          <i class="bi bi-x-circle-fill text-danger me-1"></i>
+          <strong>Test Misclassifications:</strong> <strong>{{ '{:,}'.format(model_a.test_errors) }} errors</strong> out of 24,255 samples (29.0% error rate).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model B: Autoregressive Classifier -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100 border-start border-4 border-success shadow-sm">
+      <div class="card-custom-header d-flex justify-content-between align-items-center">
+        <div>
+          <span class="badge bg-success-subtle text-success border border-success-subtle me-2">Model B</span>
+          <span class="fw-bold fs-6">Autoregressive Classifier (With Lags)</span>
+        </div>
+        <span class="badge bg-success text-white">Low Bias (~94% Acc)</span>
+      </div>
+      <div class="card-custom-body">
+        <div class="mb-3">
+          <small class="text-muted fw-bold d-block mb-1">Features Used:</small>
+          <div class="d-flex flex-wrap gap-1">
+            {% for f in model_b.features %}
+              <span class="badge bg-primary-subtle text-primary border">{{ f }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row g-2 text-center mb-3">
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Test Acc</small>
+              <strong class="fs-6 text-success">{{ '%.2f' % (model_b.test_accuracy * 100) }}%</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Precision</small>
+              <strong class="fs-6">{{ '%.4f' % model_b.precision }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">Recall</small>
+              <strong class="fs-6">{{ '%.4f' % model_b.recall }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">F1-Score</small>
+              <strong class="fs-6">{{ '%.4f' % model_b.f1_score }}</strong>
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block">ROC-AUC</small>
+              <strong class="fs-6 text-success">{{ '%.4f' % model_b.roc_auc }}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="p-2 rounded bg-light small text-muted border">
+          <i class="bi bi-check-circle-fill text-success me-1"></i>
+          <strong>Test Misclassifications:</strong> <strong>{{ '{:,}'.format(model_b.test_errors) }} errors</strong> (Error drop: <strong>{{ error_reduction }}%</strong> vs. Model A).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic Graphs Grid -->
+<div class="card-custom mb-4 shadow-sm border">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-bar-chart-steps me-2 text-primary"></i> Logistic Regression Diagnostic Visualizations
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Comparative Diagnostics</span>
+  </div>
+  <div class="card-custom-body p-4">
+    <div class="row g-4">
+      
+      <!-- Graph 1: Learning Curve -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">1. Sample Size Learning Curves: Underfitting vs. Convergence</h6>
+          <img src="{{ url_for('static', filename='charts/logreg_learning_curve.png') }}" class="img-fluid rounded mb-3 border" alt="Learning Curve">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> Model A exhibits a rigid accuracy plateau at ~71%, confirming high bias that cannot be solved by more training data. Model B rapidly converges at ~94% validation accuracy with minimal overfitting gap.
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph 2: Dual ROC Curves -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">2. Comparative Receiver Operating Characteristic (ROC) Curves</h6>
+          <img src="{{ url_for('static', filename='charts/logreg_roc_curve.png') }}" class="img-fluid rounded mb-3 border" alt="ROC Curves">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> Model B achieves near-ideal separability with an ROC-AUC of <strong>0.9859</strong>, sharply outperforming Model A's <strong>0.7511</strong>. The steep initial slope guarantees high true positive rates at near-zero false alarms.
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph 3: Precision-Recall Curves -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">3. Comparative Precision-Recall (PR) Curves</h6>
+          <img src="{{ url_for('static', filename='charts/logreg_pr_curve.png') }}" class="img-fluid rounded mb-3 border" alt="PR Curves">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> PR-AUC jumps from 0.73 in Model A to <strong>0.985</strong> in Model B. The area under the precision-recall curve confirms that high load alerts remain reliable even across aggressive dispatch decision thresholds.
+          </div>
+        </div>
+      </div>
+
+      <!-- Graph 4: Dual Confusion Matrices -->
+      <div class="col-lg-6">
+        <div class="border rounded p-3 bg-white h-100 shadow-sm">
+          <h6 class="fw-bold mb-2">4. Dual Confusion Matrix Heatmaps (Side-by-Side Comparison)</h6>
+          <img src="{{ url_for('static', filename='charts/logreg_confusion_matrices.png') }}" class="img-fluid rounded mb-3 border" alt="Dual Confusion Matrices">
+          <div class="p-2 rounded bg-light small text-muted">
+            <strong class="text-dark">Diagnostic Takeaway:</strong> Transitioning from calendar coordinates to autoregressive lags slashes total test misclassifications from <strong>7,031</strong> down to <strong>1,573</strong> (a 77.6% error reduction). False negatives drop dramatically from 3,428 to 825.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('decision_tree_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Decision Tree &rarr;
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,637 @@
+{
+  "regression_results": [
+    {
+      "key": "decision_tree",
+      "title": "Decision Tree",
+      "category": "Decision Tree",
+      "train_rmse": 314.42,
+      "test_rmse": 322.83,
+      "train_mae": 231.54,
+      "test_mae": 245.99,
+      "train_r2": 0.9853,
+      "test_r2": 0.9826,
+      "train_time_sec": 0.189,
+      "inference_time_sec": 0.003,
+      "oob_score": null,
+      "sample_predictions": [
+        15048.31,
+        15224.77,
+        14723.89,
+        14723.89,
+        14723.89
+      ]
+    },
+    {
+      "key": "random_forest",
+      "title": "Random Forest",
+      "category": "Bagging Ensemble",
+      "train_rmse": 213.77,
+      "test_rmse": 242.41,
+      "train_mae": 153.59,
+      "test_mae": 182.06,
+      "train_r2": 0.9932,
+      "test_r2": 0.9902,
+      "train_time_sec": 1.39,
+      "inference_time_sec": 0.0351,
+      "oob_score": 0.9918,
+      "sample_predictions": [
+        14955.05,
+        15221.5,
+        14763.62,
+        14684.13,
+        14632.81
+      ]
+    },
+    {
+      "key": "adaboost",
+      "title": "AdaBoost",
+      "category": "Boosting",
+      "train_rmse": 646.59,
+      "test_rmse": 613.62,
+      "train_mae": 505.74,
+      "test_mae": 485.5,
+      "train_r2": 0.9377,
+      "test_r2": 0.937,
+      "train_time_sec": 7.401,
+      "inference_time_sec": 0.076,
+      "oob_score": null,
+      "sample_predictions": [
+        14686.17,
+        15270.95,
+        14686.17,
+        14626.41,
+        14626.41
+      ]
+    },
+    {
+      "key": "gradient_boosting",
+      "title": "Gradient Boosting",
+      "category": "Boosting",
+      "train_rmse": 323.3,
+      "test_rmse": 326.99,
+      "train_mae": 245.85,
+      "test_mae": 260.5,
+      "train_r2": 0.9844,
+      "test_r2": 0.9821,
+      "train_time_sec": 9.375,
+      "inference_time_sec": 0.0212,
+      "oob_score": null,
+      "sample_predictions": [
+        15159.05,
+        15290.01,
+        14898.04,
+        14778.13,
+        14778.13
+      ]
+    },
+    {
+      "key": "xgboost",
+      "title": "XGBoost",
+      "category": "Boosting",
+      "train_rmse": 323.03,
+      "test_rmse": 325.53,
+      "train_mae": 244.89,
+      "test_mae": 258.86,
+      "train_r2": 0.9844,
+      "test_r2": 0.9823,
+      "train_time_sec": 0.253,
+      "inference_time_sec": 0.0056,
+      "oob_score": null,
+      "sample_predictions": [
+        15130.21,
+        15364.84,
+        14872.59,
+        14770.46,
+        14752.52
+      ]
+    },
+    {
+      "key": "lightgbm",
+      "title": "LightGBM",
+      "category": "Boosting",
+      "train_rmse": 322.47,
+      "test_rmse": 325.46,
+      "train_mae": 244.62,
+      "test_mae": 259.09,
+      "train_r2": 0.9845,
+      "test_r2": 0.9823,
+      "train_time_sec": 0.118,
+      "inference_time_sec": 0.0144,
+      "oob_score": null,
+      "sample_predictions": [
+        15143.34,
+        15347.98,
+        14847.77,
+        14744.62,
+        14746.64
+      ]
+    }
+  ],
+  "classification_results": [
+    {
+      "key": "decision_tree",
+      "title": "Decision Tree",
+      "category": "Decision Tree",
+      "train_accuracy": 0.9678,
+      "test_accuracy": 0.9658,
+      "precision": 0.95,
+      "recall": 0.9547,
+      "f1_score": 0.9523,
+      "train_time_sec": 0.152,
+      "inference_time_sec": 0.0025,
+      "oob_score": null,
+      "confusion_matrix": [
+        [
+          15143,
+          436
+        ],
+        [
+          393,
+          8283
+        ]
+      ]
+    },
+    {
+      "key": "random_forest",
+      "title": "Random Forest",
+      "category": "Bagging Ensemble",
+      "train_accuracy": 0.9856,
+      "test_accuracy": 0.9694,
+      "precision": 0.9548,
+      "recall": 0.96,
+      "f1_score": 0.9574,
+      "train_time_sec": 1.144,
+      "inference_time_sec": 0.0313,
+      "oob_score": 0.9718,
+      "confusion_matrix": [
+        [
+          15185,
+          394
+        ],
+        [
+          347,
+          8329
+        ]
+      ]
+    },
+    {
+      "key": "adaboost",
+      "title": "AdaBoost",
+      "category": "Boosting",
+      "train_accuracy": 0.9558,
+      "test_accuracy": 0.9559,
+      "precision": 0.9448,
+      "recall": 0.9312,
+      "f1_score": 0.9379,
+      "train_time_sec": 4.549,
+      "inference_time_sec": 0.0559,
+      "oob_score": null,
+      "confusion_matrix": [
+        [
+          15107,
+          472
+        ],
+        [
+          597,
+          8079
+        ]
+      ]
+    },
+    {
+      "key": "gradient_boosting",
+      "title": "Gradient Boosting",
+      "category": "Boosting",
+      "train_accuracy": 0.9657,
+      "test_accuracy": 0.9631,
+      "precision": 0.9504,
+      "recall": 0.9461,
+      "f1_score": 0.9482,
+      "train_time_sec": 8.866,
+      "inference_time_sec": 0.0129,
+      "oob_score": null,
+      "confusion_matrix": [
+        [
+          15151,
+          428
+        ],
+        [
+          468,
+          8208
+        ]
+      ]
+    },
+    {
+      "key": "xgboost",
+      "title": "XGBoost",
+      "category": "Boosting",
+      "train_accuracy": 0.9641,
+      "test_accuracy": 0.962,
+      "precision": 0.9498,
+      "recall": 0.9436,
+      "f1_score": 0.9467,
+      "train_time_sec": 0.128,
+      "inference_time_sec": 0.0069,
+      "oob_score": null,
+      "confusion_matrix": [
+        [
+          15146,
+          433
+        ],
+        [
+          489,
+          8187
+        ]
+      ]
+    },
+    {
+      "key": "lightgbm",
+      "title": "LightGBM",
+      "category": "Boosting",
+      "train_accuracy": 0.9642,
+      "test_accuracy": 0.9617,
+      "precision": 0.9488,
+      "recall": 0.9439,
+      "f1_score": 0.9463,
+      "train_time_sec": 0.199,
+      "inference_time_sec": 0.0163,
+      "oob_score": null,
+      "confusion_matrix": [
+        [
+          15137,
+          442
+        ],
+        [
+          487,
+          8189
+        ]
+      ]
+    }
+  ],
+  "models_detail": [
+    {
+      "key": "decision_tree",
+      "title": "Decision Tree",
+      "category": "Decision Tree",
+      "key_strength": "Directly models non-linear energy consumption thresholds with zero parametric assumptions and instant rule interpretability.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "decision_tree",
+        "title": "Decision Tree",
+        "category": "Decision Tree",
+        "train_rmse": 314.42,
+        "test_rmse": 322.83,
+        "train_mae": 231.54,
+        "test_mae": 245.99,
+        "train_r2": 0.9853,
+        "test_r2": 0.9826,
+        "train_time_sec": 0.189,
+        "inference_time_sec": 0.003,
+        "oob_score": null,
+        "sample_predictions": [
+          15048.31,
+          15224.77,
+          14723.89,
+          14723.89,
+          14723.89
+        ]
+      },
+      "classification": {
+        "key": "decision_tree",
+        "title": "Decision Tree",
+        "category": "Decision Tree",
+        "train_accuracy": 0.9678,
+        "test_accuracy": 0.9658,
+        "precision": 0.95,
+        "recall": 0.9547,
+        "f1_score": 0.9523,
+        "train_time_sec": 0.152,
+        "inference_time_sec": 0.0025,
+        "oob_score": null,
+        "confusion_matrix": [
+          [
+            15143,
+            436
+          ],
+          [
+            393,
+            8283
+          ]
+        ]
+      }
+    },
+    {
+      "key": "random_forest",
+      "title": "Random Forest",
+      "category": "Bagging Ensemble",
+      "key_strength": "Reduces variance via bootstrap bagging; provides unbiased Out-of-Bag (OOB) validation error estimation without separate validation splits.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "random_forest",
+        "title": "Random Forest",
+        "category": "Bagging Ensemble",
+        "train_rmse": 213.77,
+        "test_rmse": 242.41,
+        "train_mae": 153.59,
+        "test_mae": 182.06,
+        "train_r2": 0.9932,
+        "test_r2": 0.9902,
+        "train_time_sec": 1.39,
+        "inference_time_sec": 0.0351,
+        "oob_score": 0.9918,
+        "sample_predictions": [
+          14955.05,
+          15221.5,
+          14763.62,
+          14684.13,
+          14632.81
+        ]
+      },
+      "classification": {
+        "key": "random_forest",
+        "title": "Random Forest",
+        "category": "Bagging Ensemble",
+        "train_accuracy": 0.9856,
+        "test_accuracy": 0.9694,
+        "precision": 0.9548,
+        "recall": 0.96,
+        "f1_score": 0.9574,
+        "train_time_sec": 1.144,
+        "inference_time_sec": 0.0313,
+        "oob_score": 0.9718,
+        "confusion_matrix": [
+          [
+            15185,
+            394
+          ],
+          [
+            347,
+            8329
+          ]
+        ]
+      }
+    },
+    {
+      "key": "adaboost",
+      "title": "AdaBoost",
+      "category": "Boosting",
+      "key_strength": "Adaptive sequential residual boosting that penalizes and focuses subsequent weak learners specifically on difficult peak-demand spikes.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "adaboost",
+        "title": "AdaBoost",
+        "category": "Boosting",
+        "train_rmse": 646.59,
+        "test_rmse": 613.62,
+        "train_mae": 505.74,
+        "test_mae": 485.5,
+        "train_r2": 0.9377,
+        "test_r2": 0.937,
+        "train_time_sec": 7.401,
+        "inference_time_sec": 0.076,
+        "oob_score": null,
+        "sample_predictions": [
+          14686.17,
+          15270.95,
+          14686.17,
+          14626.41,
+          14626.41
+        ]
+      },
+      "classification": {
+        "key": "adaboost",
+        "title": "AdaBoost",
+        "category": "Boosting",
+        "train_accuracy": 0.9558,
+        "test_accuracy": 0.9559,
+        "precision": 0.9448,
+        "recall": 0.9312,
+        "f1_score": 0.9379,
+        "train_time_sec": 4.549,
+        "inference_time_sec": 0.0559,
+        "oob_score": null,
+        "confusion_matrix": [
+          [
+            15107,
+            472
+          ],
+          [
+            597,
+            8079
+          ]
+        ]
+      }
+    },
+    {
+      "key": "gradient_boosting",
+      "title": "Gradient Boosting",
+      "category": "Boosting",
+      "key_strength": "Stage-wise additive modeling minimizing squared error and log-loss gradients across complex diurnal and seasonal patterns.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "gradient_boosting",
+        "title": "Gradient Boosting",
+        "category": "Boosting",
+        "train_rmse": 323.3,
+        "test_rmse": 326.99,
+        "train_mae": 245.85,
+        "test_mae": 260.5,
+        "train_r2": 0.9844,
+        "test_r2": 0.9821,
+        "train_time_sec": 9.375,
+        "inference_time_sec": 0.0212,
+        "oob_score": null,
+        "sample_predictions": [
+          15159.05,
+          15290.01,
+          14898.04,
+          14778.13,
+          14778.13
+        ]
+      },
+      "classification": {
+        "key": "gradient_boosting",
+        "title": "Gradient Boosting",
+        "category": "Boosting",
+        "train_accuracy": 0.9657,
+        "test_accuracy": 0.9631,
+        "precision": 0.9504,
+        "recall": 0.9461,
+        "f1_score": 0.9482,
+        "train_time_sec": 8.866,
+        "inference_time_sec": 0.0129,
+        "oob_score": null,
+        "confusion_matrix": [
+          [
+            15151,
+            428
+          ],
+          [
+            468,
+            8208
+          ]
+        ]
+      }
+    },
+    {
+      "key": "xgboost",
+      "title": "XGBoost",
+      "category": "Boosting",
+      "key_strength": "Second-order Taylor expansion gradient boosting with shrinkage regularization (L1/L2), optimal split finding, and high execution speed.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "xgboost",
+        "title": "XGBoost",
+        "category": "Boosting",
+        "train_rmse": 323.03,
+        "test_rmse": 325.53,
+        "train_mae": 244.89,
+        "test_mae": 258.86,
+        "train_r2": 0.9844,
+        "test_r2": 0.9823,
+        "train_time_sec": 0.253,
+        "inference_time_sec": 0.0056,
+        "oob_score": null,
+        "sample_predictions": [
+          15130.21,
+          15364.84,
+          14872.59,
+          14770.46,
+          14752.52
+        ]
+      },
+      "classification": {
+        "key": "xgboost",
+        "title": "XGBoost",
+        "category": "Boosting",
+        "train_accuracy": 0.9641,
+        "test_accuracy": 0.962,
+        "precision": 0.9498,
+        "recall": 0.9436,
+        "f1_score": 0.9467,
+        "train_time_sec": 0.128,
+        "inference_time_sec": 0.0069,
+        "oob_score": null,
+        "confusion_matrix": [
+          [
+            15146,
+            433
+          ],
+          [
+            489,
+            8187
+          ]
+        ]
+      }
+    },
+    {
+      "key": "lightgbm",
+      "title": "LightGBM",
+      "category": "Boosting",
+      "key_strength": "Histogram-based gradient boosting with leaf-wise growth; delivers ultra-fast sub-second training latency and minimal memory footprint.",
+      "features_used": [
+        "hour",
+        "month",
+        "dayofweek",
+        "lag_1",
+        "lag_24"
+      ],
+      "regression": {
+        "key": "lightgbm",
+        "title": "LightGBM",
+        "category": "Boosting",
+        "train_rmse": 322.47,
+        "test_rmse": 325.46,
+        "train_mae": 244.62,
+        "test_mae": 259.09,
+        "train_r2": 0.9845,
+        "test_r2": 0.9823,
+        "train_time_sec": 0.118,
+        "inference_time_sec": 0.0144,
+        "oob_score": null,
+        "sample_predictions": [
+          15143.34,
+          15347.98,
+          14847.77,
+          14744.62,
+          14746.64
+        ]
+      },
+      "classification": {
+        "key": "lightgbm",
+        "title": "LightGBM",
+        "category": "Boosting",
+        "train_accuracy": 0.9642,
+        "test_accuracy": 0.9617,
+        "precision": 0.9488,
+        "recall": 0.9439,
+        "f1_score": 0.9463,
+        "train_time_sec": 0.199,
+        "inference_time_sec": 0.0163,
+        "oob_score": null,
+        "confusion_matrix": [
+          [
+            15137,
+            442
+          ],
+          [
+            487,
+            8189
+          ]
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "split_info": {
+    "total_rows": 121273,
+    "train_rows": 97018,
+    "test_rows": 24255,
+    "features": [
+      "hour",
+      "month",
+      "dayofweek",
+      "lag_1",
+      "lag_24"
+    ],
+    "median_demand_threshold": 15310.0
+  },
+  "last_run": "2026-10-16 10:52:45",
+  "models_available": [
+    "decision_tree",
+    "random_forest",
+    "adaboost",
+    "gradient_boosting",
+    "xgboost",
+    "lightgbm"
+  ]
+}

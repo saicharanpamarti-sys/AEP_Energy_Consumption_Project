@@ -1,0 +1,71 @@
+{
+  "hyperparameter_search": {
+    "grid_search": {
+      "name": "GridSearchCV",
+      "execution_time_sec": 5.81,
+      "best_cv_r2": 0.981,
+      "best_params": {
+        "max_depth": 12,
+        "min_samples_leaf": 2,
+        "n_estimators": 60
+      },
+      "combinations_tested": 8,
+      "strategy": "Exhaustive Combinatorial Scan"
+    },
+    "randomized_search": {
+      "name": "RandomizedSearchCV",
+      "execution_time_sec": 1.82,
+      "best_cv_r2": 0.981,
+      "best_params": {
+        "n_estimators": 60,
+        "min_samples_leaf": 2,
+        "max_depth": 12
+      },
+      "combinations_tested": 4,
+      "strategy": "Random Probability Sampling"
+    },
+    "bayesian_optimization": {
+      "name": "Bayesian Optimization (TPE)",
+      "execution_time_sec": 1.31,
+      "best_cv_r2": 0.9905,
+      "best_params": {
+        "max_depth": 12,
+        "n_estimators": 60,
+        "min_samples_leaf": 2
+      },
+      "combinations_tested": 10,
+      "strategy": "Sequential Expected Improvement Surrogate"
+    },
+    "speedup_factor": 3.2
+  },
+  "diagnostic_curves": {
+    "learning_curve_chart": "charts/learning_curve_autoreg.png",
+    "validation_curve_chart": "charts/validation_curve_autoreg.png",
+    "sweet_spot_depth": 10
+  },
+  "statistical_tests": {
+    "mcnemar": {
+      "contingency_table": {
+        "both_correct_a": 15195,
+        "base_only_b": 301,
+        "autoreg_only_c": 8319,
+        "both_wrong_d": 440
+      },
+      "chi2_statistic": 7456.182,
+      "p_value": 0.0,
+      "p_value_formatted": "< 0.0001",
+      "is_significant": true,
+      "conclusion": "Autoregressive Model statistically significantly outperforms Baseline (chi2 = 7456.18, p < 0.0001). We reject H0."
+    },
+    "bootstrap": {
+      "n_bootstraps": 1000,
+      "mean_rmse_reduction": 2139.3,
+      "ci_95_lower": 2123.12,
+      "ci_95_upper": 2155.7,
+      "is_significant": true,
+      "t_stat_5x2cv": 793.519,
+      "conclusion": "Autoregressive Ensemble reduces test RMSE by an average of 2139.3 MW [95% CI: +2123.12 MW to +2155.7 MW]. Since the entire 95% CI is strictly positive and far above 0, the error reduction is statistically significant (p < 0.001)."
+    }
+  },
+  "timestamp": "2026-10-16 08:48:15"
+}

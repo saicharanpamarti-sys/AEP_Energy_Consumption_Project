@@ -1,0 +1,77 @@
+{
+  "dataset_rows": 121273,
+  "application_badges": [
+    {
+      "title": "Customer & Load Profiling",
+      "icon": "bi-pie-chart-fill",
+      "color": "primary",
+      "description": "Segments grid substations and hourly load regimes into operational archetype profiles without ground-truth labels."
+    },
+    {
+      "title": "Anomaly & Outage Detection",
+      "icon": "bi-shield-exclamation",
+      "color": "danger",
+      "description": "Isolates unclustered density noise samples indicating polar vortex freezes and unexpected substation tripping."
+    },
+    {
+      "title": "Document & Pattern Grouping",
+      "icon": "bi-folder2-open",
+      "color": "warning",
+      "description": "Groups multi-lag continuous load trajectories into distinct seasonal dispatch baselines."
+    },
+    {
+      "title": "Bio-informatic & Temporal Discovery",
+      "icon": "bi-dna",
+      "color": "success",
+      "description": "Clusters recurring cyclical demand sequences analogous to genomic sequence alignment."
+    }
+  ],
+  "kmeans": {
+    "elbow_chart": "charts/kmeans_elbow_curve.png",
+    "silhouette_chart": "charts/kmeans_silhouette_curve.png",
+    "diurnal_chart": "charts/kmeans_diurnal_profiles_k3.png",
+    "optimal_k": 3
+  },
+  "hierarchical": {
+    "dendrogram_chart": "charts/hierarchical_dendrogram.png",
+    "linkages": [
+      {
+        "name": "Ward's Linkage (Default)",
+        "behavior": "Minimizes within-cluster energy variance increase upon merge.",
+        "grid_impact": "Generates tight, compact seasonal profiles; ideal for quantitative power demand curves."
+      },
+      {
+        "name": "Complete Linkage",
+        "behavior": "Calculates the maximum pairwise distance between observations in clusters.",
+        "grid_impact": "Enforces equal-diameter clusters; prevents blending peak hours into baseline regimes."
+      },
+      {
+        "name": "Average Linkage (UPGMA)",
+        "behavior": "Averages pairwise distances across all observations between candidate clusters.",
+        "grid_impact": "Robust against single outlier surges, balancing cluster size and compactness."
+      },
+      {
+        "name": "Single Linkage",
+        "behavior": "Calculates the minimum pairwise distance between nearest observations.",
+        "grid_impact": "Prone to the chaining effect; connects distinct weather profiles through transitory shoulder hours."
+      }
+    ]
+  },
+  "dbscan": {
+    "anomaly_chart": "charts/dbscan_anomaly_plot.png",
+    "default_eps": 0.85,
+    "default_min_samples": 15,
+    "core_points": 11480,
+    "noise_points": 384,
+    "noise_pct": 3.2,
+    "detected_clusters": 2
+  },
+  "gmm": {
+    "bic_aic_chart": "charts/gmm_bic_aic_curve.png",
+    "soft_assignment_chart": "charts/gmm_soft_assignment.png",
+    "optimal_components": 3,
+    "bic_score": 118000,
+    "aic_score": 114000
+  },
+  "timestamp": "2026-10-26 17:38:41"
+}

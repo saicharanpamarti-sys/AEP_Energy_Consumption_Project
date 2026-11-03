@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}PCA Dimensionality Reduction - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Unsupervised Learning &bull; Spectral Decomposition</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Principal Component Analysis (PCA)</h2>
+    <p class="text-muted mb-0">Orthogonal linear projection decomposing multi-lag temporal features into maximal variance eigen-components.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('evaluation_route') }}" class="btn btn-emerald">
+      Proceed to Metrics & Calibration &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 1. Project Justification Callout Banner -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4 border-primary shadow-sm" style="background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);">
+  <div class="card-custom-body p-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="fs-2 text-primary">
+        <i class="bi bi-question-circle-fill"></i>
+      </div>
+      <div>
+        <h5 class="fw-bold text-dark mb-2">Why use PCA with under 10 features on American Electric Power data?</h5>
+        <p class="text-muted mb-0">
+          Hourly lag features (<code>lag_1</code> and <code>lag_24</code>) have extreme autocorrelation (Pearson correlation <em>r &gt; 0.88</em>). PCA eliminates multicollinearity by compressing the continuous load dynamics into 2 uncorrelated principal components, accelerating search and spatial clustering while preserving over 90% of total variance.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 2. Variance Retention Metrics Cards -->
+<!-- ========================================================== -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-4">
+    <div class="metric-box">
+      <div class="metric-box-title">PC 1 (Explained Variance)</div>
+      <div class="metric-box-value text-primary">{{ pca_data.pc1_variance }}%</div>
+      <div class="metric-box-sub">Captures general hourly load magnitude & overall energy level</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-4">
+    <div class="metric-box">
+      <div class="metric-box-title">PC 2 (Explained Variance)</div>
+      <div class="metric-box-value text-success">{{ pca_data.pc2_variance }}%</div>
+      <div class="metric-box-sub">Captures diurnal contrast (Daytime Peak vs. Overnight Base)</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-4">
+    <div class="metric-box">
+      <div class="metric-box-title">Cumulative Variance (2 PCs)</div>
+      <div class="metric-box-value text-purple" style="color: var(--accent-purple);">{{ pca_data.cumulative_variance_2pc }}%</div>
+      <div class="metric-box-sub">Retains over 90% of structural variance in just 2 dimensions</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 3. Dual Diagnostic Visualizations -->
+<!-- ========================================================== -->
+<div class="row g-4 mb-4">
+  <!-- Chart 1: Scree Plot -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-bar-chart-fill text-primary me-2"></i> Scree Plot: Explained Variance by Component
+        </span>
+        <span class="badge bg-light text-dark border">Variance Retention</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/pca_scree_variance.png') }}" class="img-fluid rounded border mb-2" alt="PCA Scree Plot">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Dimensionality Compression:</strong> The scree curve demonstrates that the first two principal components capture <strong>{{ pca_data.cumulative_variance_2pc }}%</strong> of the variance in the 121,273 hourly observations, allowing downstream spatial models to run without multicollinearity drag.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: 2D Projection Scatter Plot -->
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-bounding-box-circles text-success me-2"></i> 2D PCA Projection: High-Demand Separation
+        </span>
+        <span class="badge bg-light text-dark border">Manifold Projection</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/pca_2d_projection.png') }}" class="img-fluid rounded border mb-2" alt="2D PCA Projection Plot">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Operational Regime Boundary:</strong> Color-coding observations by High Demand (&gt;= 15,310 MW in Red) versus Normal Demand (Green) shows natural clustering along PC1, validating that PCA preserves operational alert boundaries.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 4. Feature Loadings Breakdown -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table text-primary me-2"></i> Principal Component Feature Loadings (Eigenvector Weights)
+    </span>
+    <span class="badge bg-light text-dark border">Spectral Weights</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Autoregressive Feature</th>
+            <th>PC 1 Weight (Load Magnitude)</th>
+            <th>PC 2 Weight (Diurnal Contrast)</th>
+            <th>PC 3 Weight (Seasonal Memory)</th>
+            <th>Engineering Interpretation for Grid Dispatchers</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in pca_data.loadings %}
+            <tr>
+              <td><code>{{ row.feature }}</code></td>
+              <td><strong>{{ '%.4f' % row.pc1 }}</strong></td>
+              <td><strong>{{ '%.4f' % row.pc2 }}</strong></td>
+              <td>{{ '%.4f' % row.pc3 }}</td>
+              <td class="small text-muted">
+                {% if row.feature in ['lag_1', 'lag_24'] %}
+                  Heavily influences PC1, confirming that recent power inertia dictates overall grid operating scale.
+                {% elif row.feature == 'hour' %}
+                  Dominates PC2, capturing daily solar peak ramps versus overnight baseline drops.
+                {% elif row.feature == 'month' %}
+                  Influences seasonal weather variation (winter heating vs summer cooling cycles).
+                {% else %}
+                  Differentiates weekday industrial schedules from lighter weekend base demand.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('evaluation_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Metrics & Calibration &rarr;
+  </a>
+</div>
+{% endblock %}

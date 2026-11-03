@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Data Loading - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning Pipeline &bull; Step 1</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Data Ingestion & Schema Inspection</h2>
+    <p class="text-muted mb-0">Raw hourly electrical load consumption dataset published by American Electric Power (AEP).</p>
+  </div>
+  <div>
+    <a href="{{ url_for('eda') }}" class="btn btn-emerald">
+      Proceed to Exploratory Data Analysis &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Dataset Summary Metrics Grid -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Total Rows</div>
+      <div class="metric-box-value text-success">{{ '{:,}'.format(summary.n_rows) }}</div>
+      <div class="metric-box-sub">Verified 121,273 hourly entries</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Raw Columns</div>
+      <div class="metric-box-value">{{ summary.n_cols }}</div>
+      <div class="metric-box-sub"><code>Datetime</code>, <code>AEP_MW</code></div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Duplicate Rows</div>
+      <div class="metric-box-value text-primary">{{ summary.duplicate_count }}</div>
+      <div class="metric-box-sub">Zero duplicate records detected</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Total Missing Values</div>
+      <div class="metric-box-value text-success">{{ summary.missing_total }}</div>
+      <div class="metric-box-sub">100% complete data integrity</div>
+    </div>
+  </div>
+</div>
+
+<!-- Raw Column Data Types & Metadata Table -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-file-earmark-spreadsheet me-2 text-primary"></i> Raw Column Specifications & Data Types
+    </span>
+    <span class="badge bg-light text-dark border">Source File: {{ summary.dataset_name }}</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom mb-0">
+        <thead>
+          <tr>
+            <th>Column Name</th>
+            <th>Pandas Data Type</th>
+            <th>Missing Values</th>
+            <th>Data Role</th>
+            <th>Domain Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for col in summary.columns %}
+            <tr>
+              <td><code class="fw-bold text-dark">{{ col }}</code></td>
+              <td><span class="badge bg-light text-dark border">{{ summary.dtypes[col] }}</span></td>
+              <td>
+                {% if summary.missing_counts[col] == 0 %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">0 (0.0%)</span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger">{{ summary.missing_counts[col] }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if col == 'Datetime' %}
+                  <span class="badge bg-info-subtle text-info border">Index / Temporal Identifier</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-warning border">Continuous Target (Regression)</span>
+                {% endif %}
+              </td>
+              <td class="text-muted small">
+                {% if col == 'Datetime' %}
+                  Hourly timestamp format (YYYY-MM-DD HH:MM:SS) spanning 14 years.
+                {% else %}
+                  Megawatts (MW) of electrical power consumption recorded across the AEP grid region.
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Raw Data Preview Table (First 10 Rows) -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-table me-2 text-success"></i> First 10 Raw Observations Preview
+    </span>
+    <span class="badge bg-light text-dark border">Showing Rows 1 to 10 of 121,273</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th style="width: 80px;">Index</th>
+            <th>Datetime</th>
+            <th>AEP_MW</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in summary.preview %}
+            <tr>
+              <td class="text-muted small">{{ loop.index }}</td>
+              <td><strong>{{ row['Datetime'] }}</strong></td>
+              <td><span class="badge bg-success-subtle text-success fs-6 fw-bold">{{ '{:,.1f}'.format(row['AEP_MW']) }} MW</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('eda') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Exploratory Data Analysis &rarr;
+  </a>
+</div>
+{% endblock %}

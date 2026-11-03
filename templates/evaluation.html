@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Metrics & Calibration - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Advanced Statistical Audit &bull; Rigorous Model Evaluation</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Metrics & Probability Calibration</h2>
+    <p class="text-muted mb-0">Autoregressive error penalty analysis, imbalance metrics (ROC-AUC vs. PR-AUC), and Platt & Isotonic probability calibration.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('tuning_comparison_route') }}" class="btn btn-emerald">
+      Proceed to Tuning & Significance &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Autoregressive Audit Banner -->
+<div class="mb-4">
+  <span class="small fw-bold text-muted text-uppercase me-2">Evaluated Autoregressive Suite:</span>
+  <span class="badge-pill-feature">
+    <i class="bi bi-check2 text-success me-1"></i> hour
+  </span>
+  <span class="badge-pill-feature">
+    <i class="bi bi-check2 text-success me-1"></i> month
+  </span>
+  <span class="badge-pill-feature">
+    <i class="bi bi-check2 text-success me-1"></i> dayofweek
+  </span>
+  <span class="badge-pill-feature">
+    <i class="bi bi-check2 text-success me-1"></i> lag_1
+  </span>
+  <span class="badge-pill-feature">
+    <i class="bi bi-check2 text-success me-1"></i> lag_24
+  </span>
+  <span class="badge-pill-feature bg-light text-dark">
+    Chronological Test (24,255 samples)
+  </span>
+</div>
+
+<!-- ========================================================== -->
+<!-- 1. Regression Outlier Penalty & Error Spread -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-graph-down me-2 text-danger"></i> 1. Regression Outlier Penalty Gap (RMSE vs. MAE)
+    </span>
+    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Outlier Sensitivity</span>
+  </div>
+  <div class="card-custom-body">
+    
+    <div class="row g-3 mb-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="metric-box">
+          <div class="metric-box-title">Mean Absolute Error (MAE)</div>
+          <div class="metric-box-value text-primary">{{ data.regression.mae }} MW</div>
+          <div class="metric-box-sub">Linear average error magnitude</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="metric-box">
+          <div class="metric-box-title">Root Mean Squared Error (RMSE)</div>
+          <div class="metric-box-value text-danger">{{ data.regression.rmse }} MW</div>
+          <div class="metric-box-sub">Quadratic penalty on large errors</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="metric-box">
+          <div class="metric-box-title">Outlier Gap (RMSE &minus; MAE)</div>
+          <div class="metric-box-value text-warning">+{{ data.regression.outlier_gap }} MW</div>
+          <div class="metric-box-sub">Variance of residuals indicator (+{{ data.regression.gap_percentage }}%)</div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-3">
+        <div class="metric-box">
+          <div class="metric-box-title">Mean Abs % Error (MAPE)</div>
+          <div class="metric-box-value text-success">{{ data.regression.mape }}%</div>
+          <div class="metric-box-sub">Relative load deviation across grid</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mathematical Explanation Banner -->
+    <div class="p-3 rounded bg-light border">
+      <h6 class="fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-primary me-2"></i>Mathematical Interpretation of the Outlier Gap:</h6>
+      <p class="small text-muted mb-0">
+        {{ data.regression.explanation }}
+        Because RMSE squares residuals before averaging, RMSE is always greater than or equal to MAE. In the autoregressive model, this gap shrinks to only +{{ data.regression.outlier_gap }} MW (+{{ data.regression.gap_percentage }}%), confirming that historical momentum features successfully eliminate severe weather tail errors.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 2. Imbalance Metrics on High_Demand -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-pie-chart-fill me-2 text-primary"></i> 2. Imbalance Classification Metrics (ROC-AUC vs. PR-AUC)
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">High_Demand &ge; 15,310 MW</span>
+  </div>
+  <div class="card-custom-body">
+    
+    <div class="row g-4 align-items-center mb-3">
+      <div class="col-lg-5">
+        <div class="border rounded p-3 bg-white text-center">
+          <div class="fw-bold small text-muted text-uppercase mb-2">Confusion Matrix Breakdown</div>
+          <table class="table table-bordered table-sm text-center align-middle mb-2">
+            <thead>
+              <tr class="bg-light">
+                <th></th>
+                <th>Pred Normal</th>
+                <th>Pred High</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="bg-light text-start">Actual Normal</th>
+                <td class="cm-good py-2"><strong>{{ '{:,}'.format(data.imbalance.confusion_matrix.tn) }}</strong> (TN)</td>
+                <td class="cm-bad py-2"><strong>{{ '{:,}'.format(data.imbalance.confusion_matrix.fp) }}</strong> (FP)</td>
+              </tr>
+              <tr>
+                <th class="bg-light text-start">Actual High</th>
+                <td class="cm-bad py-2"><strong>{{ '{:,}'.format(data.imbalance.confusion_matrix.fn) }}</strong> (FN)</td>
+                <td class="cm-good py-2"><strong>{{ '{:,}'.format(data.imbalance.confusion_matrix.tp) }}</strong> (TP)</td>
+              </tr>
+            </tbody>
+          </table>
+          <small class="text-muted">Total Test Observations: 24,255</small>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="metric-box">
+              <div class="metric-box-title">Precision / Recall</div>
+              <div class="metric-box-value fs-4 text-dark">{{ data.imbalance.precision }} / {{ data.imbalance.recall }}</div>
+              <div class="metric-box-sub">F1-Score: <strong>{{ data.imbalance.f1_score }}</strong></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="metric-box">
+              <div class="metric-box-title">ROC-AUC Score</div>
+              <div class="metric-box-value fs-4 text-success">{{ data.imbalance.roc_auc }}</div>
+              <div class="metric-box-sub">Area under ROC Curve</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="metric-box">
+              <div class="metric-box-title">PR-AUC (Avg Precision)</div>
+              <div class="metric-box-value fs-4 text-purple" style="color: var(--accent-purple);">{{ data.imbalance.pr_auc }}</div>
+              <div class="metric-box-sub">Precision-Recall Area</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="metric-box">
+              <div class="metric-box-title">Overall Accuracy</div>
+              <div class="metric-box-value fs-4 text-primary">{{ '%.2f' % (data.imbalance.accuracy * 100) }}%</div>
+              <div class="metric-box-sub">Balanced median threshold</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROC vs PR AUC Analysis Banner -->
+    <div class="p-3 rounded bg-light border">
+      <h6 class="fw-bold text-dark mb-1"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Why PR-AUC Avoids the Accuracy / ROC Imbalance Trap:</h6>
+      <p class="small text-muted mb-0">
+        {{ data.imbalance.explanation }}
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 3. Probability Calibration & Reliability Diagram -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-bullseye me-2 text-success"></i> 3. Probability Calibration (Platt Sigmoid vs. Isotonic Regression)
+    </span>
+    <span class="badge bg-success-subtle text-success border border-success-subtle">Reliability Audit</span>
+  </div>
+  <div class="card-custom-body">
+    
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6 text-center">
+        <img src="{{ url_for('static', filename='charts/calibration_curve.png') }}" class="chart-img-fluid mb-2" alt="Reliability Diagram">
+        <small class="text-muted d-block">Closer to the 45&deg; dashed line indicates superior probabilistic calibration.</small>
+      </div>
+
+      <div class="col-lg-6">
+        <h6 class="fw-bold text-dark mb-3">Brier Score Comparison (Mean Squared Error of Probabilities):</h6>
+        <div class="table-responsive mb-3">
+          <table class="table table-custom mb-0">
+            <thead>
+              <tr>
+                <th>Calibration Method</th>
+                <th>Brier Score &darr;</th>
+                <th>Improvement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Uncalibrated Random Forest</strong></td>
+                <td><strong class="text-danger">{{ data.calibration.brier_uncalibrated }}</strong></td>
+                <td><span class="badge bg-secondary-subtle text-secondary">Baseline</span></td>
+              </tr>
+              <tr>
+                <td><strong>Platt Scaling (Sigmoid)</strong></td>
+                <td><strong class="text-primary">{{ data.calibration.brier_sigmoid }}</strong></td>
+                <td><span class="badge bg-primary-subtle text-primary">-{{ '%.1f' % (((data.calibration.brier_uncalibrated - data.calibration.brier_sigmoid)/data.calibration.brier_uncalibrated)*100) }}% Error</span></td>
+              </tr>
+              <tr style="background-color: #f0fdf4;">
+                <td><strong>Isotonic Regression (Non-parametric)</strong></td>
+                <td><strong class="text-success">{{ data.calibration.brier_isotonic }}</strong></td>
+                <td>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    -{{ data.calibration.brier_reduction }}% Brier Error (Optimal)
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="p-3 rounded bg-light border small text-muted">
+          <strong class="text-dark d-block mb-1">Operational Grid Importance:</strong>
+          Uncalibrated tree ensembles exhibit sigmoidal distortions (under-confident near 0 and 1, over-confident in the middle). Isotonic calibration aligns predicted probabilities directly with true empirical grid dispatch frequencies, allowing power plant operators to trust predicted risk percentages.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

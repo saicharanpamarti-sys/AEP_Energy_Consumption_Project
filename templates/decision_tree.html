@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Tree - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning &bull; Single Tree Architecture</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Decision Tree Regressor & Classifier</h2>
+    <p class="text-muted mb-0">Non-parametric hierarchical partitioning capturing non-linear diurnal demand boundaries.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('bagging_route') }}" class="btn btn-emerald">
+      Proceed to Bagging Techniques &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Key Strength Callout Banner -->
+<div class="key-strength-banner mb-3">
+  <div class="fs-3 text-success">
+    <i class="bi bi-diagram-2"></i>
+  </div>
+  <div>
+    <div class="key-strength-title">Key Architectural Strength</div>
+    <p class="key-strength-text">
+      <strong>Zero Parametric Assumptions & Instant Interpretability:</strong> Decision trees split feature spaces orthogonally along variance-reduction and Gini impurity thresholds. They require zero feature scaling, handle non-linear diurnal switches naturally, and output transparent, human-auditable decision rules for grid operators.
+    </p>
+  </div>
+</div>
+
+<!-- Autoregressive Feature Badges -->
+<div class="mb-4">
+  <span class="small fw-bold text-muted text-uppercase me-2">Autoregressive Feature Set (5 Features):</span>
+  {% for feat in regression.features_used %}
+    <span class="badge-pill-feature">
+      <i class="bi bi-check2 text-success me-1"></i> {{ feat }}
+    </span>
+  {% endfor %}
+  <span class="badge-pill-feature bg-light text-dark">
+    Chronological 80/20 Split (97,018 Train / 24,255 Test)
+  </span>
+</div>
+
+<!-- Primary Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Regression Test R²</div>
+      <div class="metric-box-value text-success">{{ '%.4f' % regression.test_r2 }}</div>
+      <div class="metric-box-sub">Train R²: {{ '%.4f' % regression.train_r2 }}</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Regression RMSE</div>
+      <div class="metric-box-value text-success">{{ '%.2f' % regression.test_rmse }} MW</div>
+      <div class="metric-box-sub">MAE: {{ '%.2f' % regression.test_mae }} MW</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Classification Accuracy</div>
+      <div class="metric-box-value text-primary">{{ '%.2f' % (classification.test_accuracy * 100) }}%</div>
+      <div class="metric-box-sub">F1-Score: <strong>{{ '%.4f' % classification.f1_score }}</strong></div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-lg-3">
+    <div class="metric-box">
+      <div class="metric-box-title">Execution Speed</div>
+      <div class="metric-box-value text-purple" style="color: var(--accent-purple);">{{ '%.3f' % regression.train_time_sec }}s</div>
+      <div class="metric-box-sub">Inference: &lt; 0.002s (Sub-millisecond)</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feature Importance & Tree Structure Row -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-bar-chart-fill me-2 text-primary"></i> Feature Importances Bar Chart
+        </span>
+        <span class="badge bg-light text-dark border">Gini / Variance Reduction</span>
+      </div>
+      <div class="card-custom-body text-center">
+        <img src="{{ url_for('static', filename='charts/dt_feature_importance.png') }}" class="chart-img-fluid mb-2" alt="Decision Tree Feature Importance">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Autoregressive Dominance:</strong> <code>lag_1</code> accounts for ~81% of variance reduction importance, capturing real-time load momentum, while <code>lag_24</code> (~10%) and <code>hour</code> (~5%) capture diurnal cyclical boundaries.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-custom h-100">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-grid-3x3 me-2 text-success"></i> Test Classification Confusion Matrix
+        </span>
+        <span class="badge bg-light text-dark border">Test Rows: 24,255</span>
+      </div>
+      <div class="card-custom-body d-flex flex-column justify-content-center">
+        <table class="table table-bordered table-sm text-center align-middle mb-3" style="max-width: 400px; margin: 0 auto;">
+          <thead>
+            <tr class="bg-light">
+              <th></th>
+              <th>Pred Normal (0)</th>
+              <th>Pred High (1)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th class="bg-light text-start">Actual Normal</th>
+              <td class="cm-good py-3"><strong>{{ '{:,}'.format(classification.confusion_matrix[0][0]) }}</strong> (TN)</td>
+              <td class="cm-bad py-3"><strong>{{ '{:,}'.format(classification.confusion_matrix[0][1]) }}</strong> (FP)</td>
+            </tr>
+            <tr>
+              <th class="bg-light text-start">Actual High</th>
+              <td class="cm-bad py-3"><strong>{{ '{:,}'.format(classification.confusion_matrix[1][0]) }}</strong> (FN)</td>
+              <td class="cm-good py-3"><strong>{{ '{:,}'.format(classification.confusion_matrix[1][1]) }}</strong> (TP)</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-center small text-muted">
+          Precision: <strong>{{ '%.4f' % classification.precision }}</strong> &bull; Recall: <strong>{{ '%.4f' % classification.recall }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Max Depth Impact Table (Bias-Variance Tradeoff) -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-layers me-2 text-warning"></i> Max-Depth Impact Analysis Table (Underfitting vs. Overfitting)
+    </span>
+    <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Bias / Variance Diagnostic</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Max Depth Parameter</th>
+            <th>Train R²</th>
+            <th>Test R² &uarr;</th>
+            <th>Test RMSE (MW) &darr;</th>
+            <th>Train Accuracy</th>
+            <th>Test Accuracy &uarr;</th>
+            <th>Diagnostic Regime</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in depth_table %}
+            <tr {% if row.status == 'Sweet Spot' %}style="background-color: #f0fdf4;"{% endif %}>
+              <td><strong>depth = {{ row.depth }}</strong></td>
+              <td>{{ '%.4f' % row.train_r2 }}</td>
+              <td><strong>{{ '%.4f' % row.test_r2 }}</strong></td>
+              <td>{{ '%.2f' % row.test_rmse }} MW</td>
+              <td>{{ row.train_acc }}%</td>
+              <td><strong>{{ row.test_acc }}%</strong></td>
+              <td>
+                {% if row.status == 'Sweet Spot' %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-check-circle-fill me-1"></i> Sweet Spot (Optimal Generalization)
+                  </span>
+                {% elif row.status == 'Underfitting' %}
+                  <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    Underfitting (High Bias)
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                    Overfitting (High Variance)
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Diagnostic Curve: Max Depth vs. Generalization -->
+<div class="card-custom mb-4 shadow-sm border">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-graph-up me-2 text-primary"></i> Decision Tree Complexity & Overfitting Boundary Curve
+    </span>
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Diagnostic Curve</span>
+  </div>
+  <div class="card-custom-body p-4">
+    <div class="text-center mb-3">
+      <img src="{{ url_for('static', filename='charts/dt_depth_curve.png') }}" class="img-fluid rounded border" alt="Tree Depth vs Score Curve" style="max-height: 400px;">
+    </div>
+    <div class="p-3 rounded bg-light border-start border-3 border-primary small text-muted">
+      <strong class="text-dark"><i class="bi bi-info-circle-fill text-primary me-1"></i> Academic Takeaway:</strong>
+      As maximum depth increases past 8, training R² continues growing towards 0.99 while validation R² peaks and degrades from 0.692 down to 0.518. This empirical gap demonstrates classic unpruned tree variance explosion, validating optimal tree pruning at depth 8–10.
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('bagging_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Bagging Techniques &rarr;
+  </a>
+</div>
+{% endblock %}

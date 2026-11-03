@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Boosting Techniques - AEP Energy Consumption ML Platform{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <div class="text-uppercase text-muted fw-bold small">Supervised Learning &bull; Sequential Boosting Architecture</div>
+    <h2 class="fw-bold mb-1" style="color: var(--primary-dark);">Boosting Techniques Suite</h2>
+    <p class="text-muted mb-0">Sequential error-correcting ensembles evaluated on the 5-feature Autoregressive matrix.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('predictor_route') }}" class="btn btn-emerald">
+      Proceed to Live Prediction &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 0. Champion Architecture Callout Banner -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4 border-warning shadow-sm" style="background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);">
+  <div class="card-custom-body p-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="fs-1 text-warning">
+        <i class="bi bi-trophy-fill"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+          <h4 class="fw-bold mb-0 text-dark">Enterprise Boosting Champions: XGBoost & LightGBM</h4>
+          <span class="badge bg-warning text-dark fw-bold">Autoregressive Benchmark Leader</span>
+        </div>
+        <p class="text-muted mb-3 small">
+          Equipped with the 5-feature Autoregressive matrix <code>['hour', 'month', 'dayofweek', 'lag_1', 'lag_24']</code>, sequential boosting models deliver high-precision continuous forecasting and peak alert detection:
+        </p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="p-3 bg-white rounded border border-primary-subtle">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold text-primary"><i class="bi bi-shield-check me-1"></i> XGBoost &bull; Precision & Regularization Champion</span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">R² = 0.9823</span>
+              </div>
+              <p class="small text-muted mb-0">
+                Second-order Taylor expansion gradients with L1/L2 shrinkage yield the lowest boosting test RMSE (<strong>325.53 MW</strong>) and <strong>96.20%</strong> classification accuracy with optimal split depth.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-white rounded border border-success-subtle">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold text-success"><i class="bi bi-lightning-charge-fill me-1"></i> LightGBM &bull; Speed & Scalability Champion</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle">0.22s Latency</span>
+              </div>
+              <p class="small text-muted mb-0">
+                Histogram-based gradient binning and GOSS execute <strong>28&times; faster</strong> than classic Gradient Boosting (0.22s vs 7.82s) while matching top accuracy (<strong>96.17%</strong>) and lowest RMSE (<strong>325.46 MW</strong>).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 1. Interactive 4-Model Tabbed Interface -->
+<!-- ========================================================== -->
+<div class="card-custom mb-5">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-lightning-charge-fill me-2 text-warning"></i> Interactive Boosting Models Tab Viewer
+    </span>
+    <span class="badge bg-light text-dark border">4 Approved Boosting Architectures</span>
+  </div>
+  <div class="card-custom-body">
+    
+    <!-- Tab Navigation Headers -->
+    <ul class="nav nav-tabs nav-tabs-custom" id="boostingTabs" role="tablist">
+      {% for m in boosting_models %}
+        <li class="nav-item" role="presentation">
+          <button class="nav-link {% if loop.first %}active{% endif %}" 
+                  id="{{ m.key }}-tab" 
+                  data-bs-toggle="tab" 
+                  data-bs-target="#{{ m.key }}-pane" 
+                  type="button" 
+                  role="tab" 
+                  aria-controls="{{ m.key }}-pane" 
+                  aria-selected="{% if loop.first %}true{% else %}false{% endif %}">
+            <i class="bi bi-lightning-fill text-warning me-1"></i>
+            {{ m.title }}
+            {% if m.key == 'xgboost' %}
+              <span class="badge bg-primary-subtle text-primary ms-1">Champion</span>
+            {% elif m.key == 'lightgbm' %}
+              <span class="badge bg-success-subtle text-success ms-1">Fastest</span>
+            {% endif %}
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <!-- Tab Content Panes -->
+    <div class="tab-content pt-3" id="boostingTabsContent">
+      {% for m in boosting_models %}
+        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+             id="{{ m.key }}-pane" 
+             role="tabpanel" 
+             aria-labelledby="{{ m.key }}-tab">
+          
+          <!-- Key Strength Banner -->
+          <div class="key-strength-banner mb-3">
+            <div class="fs-4 text-warning">
+              <i class="bi bi-award-fill"></i>
+            </div>
+            <div>
+              <div class="key-strength-title">{{ m.title }} &bull; Key Strength Banner</div>
+              <p class="key-strength-text">{{ m.key_strength }}</p>
+            </div>
+          </div>
+
+          <!-- Feature Badges -->
+          <div class="mb-4">
+            <span class="small fw-bold text-muted text-uppercase me-2">Autoregressive Features Used:</span>
+            {% for feat in m.features_used %}
+              <span class="badge-pill-feature">
+                <i class="bi bi-check2 text-success me-1"></i> {{ feat }}
+              </span>
+            {% endfor %}
+            <span class="badge-pill-feature bg-light text-dark">
+              Target: AEP_MW (MW Load) & High_Demand (&ge; 15,310 MW)
+            </span>
+          </div>
+
+          <!-- Performance Metric Cards -->
+          <div class="row g-3 mb-3">
+            <div class="col-sm-6 col-lg-3">
+              <div class="metric-box">
+                <div class="metric-box-title">Test R² Score</div>
+                <div class="metric-box-value text-success">{{ '%.4f' % m.regression.test_r2 }}</div>
+                <div class="metric-box-sub">RMSE: {{ '%.2f' % m.regression.test_rmse }} MW</div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+              <div class="metric-box">
+                <div class="metric-box-title">Classification Accuracy</div>
+                <div class="metric-box-value text-primary">{{ '%.2f' % (m.classification.test_accuracy * 100) }}%</div>
+                <div class="metric-box-sub">F1-Score: <strong>{{ '%.4f' % m.classification.f1_score }}</strong></div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+              <div class="metric-box">
+                <div class="metric-box-title">Training Execution Time</div>
+                <div class="metric-box-value text-warning">{{ '%.3f' % m.regression.train_time_sec }}s</div>
+                <div class="metric-box-sub">
+                  {% if m.key == 'lightgbm' %}
+                    <span class="badge bg-success-subtle text-success">Sub-Second (0.22s)</span>
+                  {% elif m.key == 'xgboost' %}
+                    <span class="badge bg-primary-subtle text-primary">High-Speed (1.45s)</span>
+                  {% else %}
+                    Sequential Fitting
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+              <div class="metric-box">
+                <div class="metric-box-title">Inference Latency</div>
+                <div class="metric-box-value text-purple" style="color: var(--accent-purple);">{{ '%.4f' % m.regression.inference_time_sec }}s</div>
+                <div class="metric-box-sub">24,255 test predictions</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 2. Execution Speed & Accuracy Benchmark Table -->
+<!-- ========================================================== -->
+<div class="card-custom mb-4">
+  <div class="card-custom-header">
+    <span class="fw-bold fs-6">
+      <i class="bi bi-stopwatch-fill me-2 text-primary"></i> 4-Boosting Algorithms Execution Speed & Accuracy Benchmark
+    </span>
+    <span class="badge bg-light text-dark border">Test Set: 24,255 Records (Chronological 80/20 Split)</span>
+  </div>
+  <div class="card-custom-body p-0">
+    <div class="table-responsive">
+      <table class="table table-custom table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Algorithm</th>
+            <th>Training Time (s) &darr;</th>
+            <th>Inference Time (s)</th>
+            <th>Test RMSE (MW) &darr;</th>
+            <th>Test R² &uarr;</th>
+            <th>Test Accuracy &uarr;</th>
+            <th>F1-Score &uarr;</th>
+            <th>Speed & Quality Ranking</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in boosting_models %}
+            <tr {% if m.key == 'xgboost' %}style="background-color: #eff6ff;"{% elif m.key == 'lightgbm' %}style="background-color: #f0fdf4;"{% endif %}>
+              <td>
+                <strong>{{ m.title }}</strong>
+                {% if m.key == 'xgboost' %}
+                  <span class="badge bg-primary text-white ms-1">Champion</span>
+                {% elif m.key == 'lightgbm' %}
+                  <span class="badge bg-success text-white ms-1">Fastest</span>
+                {% endif %}
+              </td>
+              <td><strong>{{ '%.3f' % m.regression.train_time_sec }}s</strong></td>
+              <td>{{ '%.4f' % m.regression.inference_time_sec }}s</td>
+              <td><strong>{{ '%.2f' % m.regression.test_rmse }} MW</strong></td>
+              <td><strong>{{ '%.4f' % m.regression.test_r2 }}</strong></td>
+              <td><strong>{{ '%.2f' % (m.classification.test_accuracy * 100) }}%</strong></td>
+              <td>{{ '%.4f' % m.classification.f1_score }}</td>
+              <td>
+                {% if m.key == 'xgboost' %}
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    <i class="bi bi-trophy-fill me-1"></i> #1 Boosting Champion (2nd-Order)
+                  </span>
+                {% elif m.key == 'lightgbm' %}
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">
+                    <i class="bi bi-lightning-fill me-1"></i> #1 Ultra-Fast (Histogram 0.22s)
+                  </span>
+                {% elif m.key == 'gradient_boosting' %}
+                  <span class="badge bg-light text-dark border">
+                    #3 Classic Gradient (Stage-Wise)
+                  </span>
+                {% else %}
+                  <span class="badge bg-light text-dark border">
+                    #4 Adaptive Weighting (Exponential)
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================== -->
+<!-- 3. Diagnostic Visualizations: Loss Curves & Speed Frontier -->
+<!-- ========================================================== -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="card-custom h-100 shadow-sm border">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-graph-down me-2 text-primary"></i> Boosting Iteration Convergence (Log-Loss Curves)
+        </span>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Optimization Trajectory</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/boosting_loss_curve.png') }}" class="img-fluid rounded border mb-2" alt="Boosting Loss Curves">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Gradient Convergence:</strong> Second-order Taylor expansion (XGBoost) and GOSS histogram binning (LightGBM) converge to minimal log-loss (&lt; 0.10) in &lt; 30 iterations on autoregressive features, significantly outpacing first-order exponential loss reweighting in AdaBoost.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card-custom h-100 shadow-sm border">
+      <div class="card-custom-header">
+        <span class="fw-bold fs-6">
+          <i class="bi bi-speedometer2 me-2 text-success"></i> Training Execution Time vs. Accuracy Pareto Frontier
+        </span>
+        <span class="badge bg-success-subtle text-success border border-success-subtle">Speed vs Accuracy</span>
+      </div>
+      <div class="card-custom-body text-center p-3">
+        <img src="{{ url_for('static', filename='charts/boosting_speed_frontier.png') }}" class="img-fluid rounded border mb-2" alt="Boosting Speed Frontier">
+        <p class="small text-muted mb-0 text-start">
+          <strong class="text-dark">Pareto Dominance:</strong> LightGBM trains in <strong>0.22 seconds</strong> (28&times; faster than Gradient Boosting and 25&times; faster than AdaBoost) while establishing high test accuracy (<strong>96.17%</strong>), while XGBoost secures the best regularized stability (<strong>96.20%</strong>).
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Progression -->
+<div class="d-flex justify-content-end mb-4">
+  <a href="{{ url_for('predictor_route') }}" class="btn btn-emerald px-4 py-2">
+    Proceed to Live Demand Prediction &rarr;
+  </a>
+</div>
+{% endblock %}

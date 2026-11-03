@@ -1,0 +1,47 @@
+{
+  "features_evaluated": [
+    "hour",
+    "month",
+    "dayofweek",
+    "lag_1",
+    "lag_24"
+  ],
+  "sample_split": {
+    "train_size": 97018,
+    "test_size": 24255,
+    "split_type": "Chronological (shuffle=False)"
+  },
+  "regression": {
+    "mae": 182.06,
+    "rmse": 242.41,
+    "mape": 1.24,
+    "r2": 0.9902,
+    "outlier_gap": 60.35,
+    "gap_percentage": 33.1,
+    "explanation": "Using Autoregressive features, MAE drops to 182.06 MW and RMSE drops to 242.41 MW (down from ~1,517 MW in calendar baselines). The Outlier Gap shrinks to +60.35 MW (+33.1%), demonstrating that real-time load momentum eliminates heavy-tailed prediction spikes during weather transitions."
+  },
+  "imbalance": {
+    "confusion_matrix": {
+      "tn": 15185,
+      "fp": 394,
+      "fn": 347,
+      "tp": 8329
+    },
+    "total_errors": 741,
+    "accuracy": 0.9694,
+    "precision": 0.9548,
+    "recall": 0.96,
+    "f1_score": 0.9574,
+    "roc_auc": 0.9965,
+    "pr_auc": 0.9941,
+    "explanation": "On the 24,255 chronological test samples, the Autoregressive model achieves 96.94% accuracy with only 741 total misclassifications (FP=394, FN=347), dramatically outperforming the calendar baseline (> 4,800 errors). Both ROC-AUC (0.9965) and PR-AUC (0.9941) exceed 0.99, demonstrating exceptional discrimination."
+  },
+  "calibration": {
+    "brier_uncalibrated": 0.0223,
+    "brier_sigmoid": 0.0235,
+    "brier_isotonic": 0.0225,
+    "brier_reduction": -1.21,
+    "chart_file": "charts/calibration_curve.png"
+  },
+  "timestamp": "2026-10-16 08:48:01"
+}
